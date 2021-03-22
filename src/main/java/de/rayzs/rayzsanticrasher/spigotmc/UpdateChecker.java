@@ -22,9 +22,7 @@ public class UpdateChecker {
 			try (InputStream inputStream = new URL(
 					"https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream();
 					Scanner scanner = new Scanner(inputStream)) {
-				if (scanner.hasNext()) {
-					consumer.accept(scanner.next());
-				}
+				if (scanner.hasNext()) consumer.accept(scanner.next());
 			} catch (IOException exception) {
 				instance.logger("§8[§4R§cA§4C§8] §7Error searching for a new update§8: §c" + exception.getMessage());
 			}

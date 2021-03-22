@@ -30,18 +30,20 @@ public class PlayerJoin implements Listener {
 		String clientAddress = player.getAddress().getHostString().toString().split(":")[0];
 		if (!api.existCrashPlayer(player))
 			api.createCrashPlayer(player);
-		if (player.hasPermission("rayzsanticrasher.notify") && !api.existNotify(player))
-			if (instance.useMySQL()) {
-				Integer result = 1;
-				try {
-					result = instance.getNotifySQL().getInteger(player.getUniqueId(), "NOTIFY");
-				} catch (Exception error) {
-					if (instance.useMySQL())
-						instance.getNotifySQL().set(player.getUniqueId(), "NOTIFY", result);
-				}
-				api.setNotify(player, result);
-			} else
-				api.setNotify(player, 1);
+		if (instance.useMySQL())
+			if (player.hasPermission("rayzsanticrasher.notify") && !api.existNotify(player))
+				Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
+					public void run() {
+						Integer result = 1;
+						try {
+							result = instance.getNotifySQL().getInteger(player.getUniqueId(), "NOTIFY");
+						} catch (Exception error) {
+							if (instance.useMySQL()) instance.getNotifySQL().set(player.getUniqueId(), "NOTIFY", result);
+						}
+						api.setNotify(player, result);
+					}
+				});
+			else api.setNotify(player, 1);
 		if (instance.getServerInjector().hasInjected(craftPlayer.getHandle().playerConnection.networkManager.channel))
 			instance.getServerInjector()
 					.uninjectChannel(craftPlayer.getHandle().playerConnection.networkManager.channel);
@@ -51,14 +53,14 @@ public class PlayerJoin implements Listener {
 					@Override
 					public void run() {
 						TextComponent clickCompoment = new TextComponent("§b§l§nHERE§7");
-						clickCompoment.setClickEvent(
-								new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/rac-anticrash-antibot-firewall-plugin-spigot-1-8-8.90435/"));
+						clickCompoment.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+								"https://www.spigotmc.org/resources/rac-anticrash-antibot-firewall-plugin-spigot-1-8-8.90435/"));
 						player.sendMessage("§8[§4R§cA§4C§8] §7This server is still using an §coutdated §7version§8.");
 						player.spigot().sendMessage(new TextComponent("§8[§4R§cA§4C§8] §7Click "), clickCompoment,
 								new TextComponent(" §7to get the newest version§8."));
 					}
 				}, 20);
-		
+
 		Bukkit.getScheduler().runTaskLater(instance, new Runnable() {
 			@Override
 			public void run() {

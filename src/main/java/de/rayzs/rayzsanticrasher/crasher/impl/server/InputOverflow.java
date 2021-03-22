@@ -31,10 +31,8 @@ public class InputOverflow extends ByteToMessageDecoder {
 			if (byteBuf.array().length > 5000) {
 				channel.flush();
 				channel.close();
-				api.doNotify(
-						"§8[§9R§bA§9C§8] §b" + clientAddress + " §8» §b" + "§b" + this.getClass().getSimpleName()
-								+ " §8┊┊ §b" + byteBuf.array().length + "§9x §b§n§o" + byteBuf.toString(),
-						player.getPlayer());
+				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(clientAddress, byteBuf.array().length,
+						this.getClass().getSimpleName(), byteBuf.toString()), player);
 			}
 			list.add(byteBuf.readBytes(byteBuf.readableBytes()));
 		} catch (Exception error) {

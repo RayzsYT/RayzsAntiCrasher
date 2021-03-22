@@ -12,7 +12,7 @@ import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.Packet;
 
 public class Crasher {
-	
+
 	private RayzsAntiCrasherAPI api;
 	private Player player;
 	private Channel channel;
@@ -54,9 +54,8 @@ public class Crasher {
 			if (check) {
 				channel.flush();
 				channel.close();
-				api.doNotify("§8[§9R§bA§9C§8] §b" + player.getName() + " §8» §b"
-						+ currentCheck.getClass().getSimpleName() + " §8┊┊ §b" + amount + "§9x §b§n§o" + packetName,
-						player);
+				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(player.getName(), amount,
+						currentCheck.getClass().getSimpleName(), packetName), player);
 				return;
 			}
 		}
@@ -69,9 +68,8 @@ public class Crasher {
 			if (check) {
 				channel.flush();
 				channel.close();
-				api.doNotify("§8[§9R§bA§9C§8] §b" + player.getName() + " §8» §b"
-						+ currentCheck.getClass().getSimpleName() + " §8┊┊ §b" + amount + "§9x §b§n§o" + packetName,
-						player);
+				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(player.getName(), amount,
+						currentCheck.getClass().getSimpleName(), packetName), player);
 				return;
 			}
 		}
@@ -86,10 +84,11 @@ public class Crasher {
 				channel.flush();
 				channel.close();
 				try {
-					api.doNotify("§8[§9R§bA§9C§8] §b" + address + " §8» §b" + currentCheck.getClass().getSimpleName()
-							+ " §8┊┊ §b§n§o" + packetName, player);
+					api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(address, amount,
+							currentCheck.getClass().getSimpleName(), packetName), player);
 					return;
-				} catch (Exception error) { }
+				} catch (Exception error) {
+				}
 				return;
 			}
 		}

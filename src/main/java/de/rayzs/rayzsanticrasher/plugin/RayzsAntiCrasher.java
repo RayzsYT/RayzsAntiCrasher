@@ -2,6 +2,7 @@ package de.rayzs.rayzsanticrasher.plugin;
 
 import java.io.File;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -51,7 +52,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.1", download;
+	private String version = "2.1.2";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
@@ -61,7 +62,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	private File thisFile, addonFolder;
 	private Boolean isRunning;
 	private AddonManager addonManager;
-	private String configFilePath;
+	private String configFilePath, crashReportMessage, standardMessage;
 
 	@Override
 	public void onDisable() {
@@ -106,7 +107,8 @@ public class RayzsAntiCrasher extends JavaPlugin {
 				Bukkit.getOnlinePlayers().forEach(players -> api.deleteCrashPlayer(players));
 				api.destroy();
 			}
-		} catch (Exception error) { }
+		} catch (Exception error) {
+		}
 		disable();
 		logger("§8[§4R§cA§4C§8] §7The plugin is now §coffline§8!");
 	}
@@ -181,7 +183,9 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		try {
 			useMySQL = mysqlFile.getYAML().getBoolean("enabled");
 			mysqlFile.set("enabled", useMySQL);
-		} catch (Exception error) { mysqlFile.set("enabled", false); }
+		} catch (Exception error) {
+			mysqlFile.set("enabled", false);
+		}
 		mysql = new MySQL(mysqlFile.search("host").getString("localhost"), mysqlFile.search("port").getInt(3306),
 				mysqlFile.search("username").getString("Username"), mysqlFile.search("passwort").getString("Password"),
 				mysqlFile.search("database").getString("Database"));
@@ -195,8 +199,10 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	}
 
 	private void loadPropeties() {
-		instance.getConfigFile().search("messages.informations")
-				.getString("&7This server is using &9Rayzs&bAnti&9Crasher &8- &b&l&nv" + version + "&8.");
+		crashReportMessage = instance.getConfigFile().search("messages.crashreport")
+				.getString("&7&8[&9R&bA&9C&8] &b%CLIENT% &8| &b%DETECTION% %AMOUNT%&9x &b&n&o%PACKET%");
+		standardMessage = instance.getConfigFile().search("messages.informations")
+				.getString("&7This server is using &9Rayzs&bAnti&9Crasher &8- &b&l&nv%VERSION%&8.");
 	}
 
 	public static RayzsAntiCrasher getInstance() {
@@ -252,8 +258,15 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		return mysql;
 	}
 
-	public String getDownload() {
-		return download;
+	public String getStandartMessage() {
+		final String text = standardMessage.replace("%VERSION%", version);
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+
+	public String getCrashReportMessage(String client, Integer amount, String check, String packet) {
+		final String text = (crashReportMessage.replace("%CLIENT%", client).replace("%AMOUNT%", amount.toString())
+				.replace("%DETECTION%", check).replace("%PACKET%", packet));
+		return ChatColor.translateAlternateColorCodes('&', text);
 	}
 
 	public Boolean useMySQL() {

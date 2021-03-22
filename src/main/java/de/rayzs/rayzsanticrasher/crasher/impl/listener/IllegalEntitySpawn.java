@@ -17,7 +17,7 @@ public class IllegalEntitySpawn implements Listener {
 	public IllegalEntitySpawn() {
 		instance = RayzsAntiCrasher.getInstance();
 		max = instance.getCheckFile().search(
-				"settings.listener." + this.getClass().getSimpleName().toLowerCase().split("@")[0] + "." + "max").getInt(10000);
+				"settings.listener." + this.getClass().getSimpleName().toLowerCase().split("@")[0] + "." + "max").getInt(5000);
 	}
 	
 	@EventHandler

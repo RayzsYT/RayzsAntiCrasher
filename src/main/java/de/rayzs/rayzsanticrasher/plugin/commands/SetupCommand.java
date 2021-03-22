@@ -33,7 +33,7 @@ public class SetupCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!sender.hasPermission("rayzsanticrasher.use")) {
-			sender.sendMessage(instance.getConfigFile().search("messages.informations").getString());
+			sender.sendMessage(instance.getStandartMessage());
 			return false;
 		}
 		if (args.length < 1) {
