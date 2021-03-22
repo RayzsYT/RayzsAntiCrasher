@@ -1,0 +1,9 @@
+author: Rayzs_YT
+name: RayzsAntiCrasher
+main: de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher
+version: 2.1.1
+
+commands:
+ 
+ rayzsanticrasher:
+ rac:
