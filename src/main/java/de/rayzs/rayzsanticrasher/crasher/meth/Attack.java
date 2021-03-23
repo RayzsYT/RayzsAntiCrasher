@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
+
+import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 import de.rayzs.rayzsanticrasher.runtime.RuntimeExec;
 
 public class Attack {
 
+	private RayzsAntiCrasher instance;
 	private String taskName;
 	private List<String> whiteList, blackList, waitingList;
 	private HashMap<String, Integer> connectionHash;
@@ -15,6 +18,7 @@ public class Attack {
 	private Boolean isRunning, underAttack, useIPTable;
 
 	public Attack(String taskName, Boolean useIPTable) {
+		instance = RayzsAntiCrasher.getInstance();
 		this.taskName = taskName;
 		underAttack = false;
 		this.useIPTable = useIPTable;
@@ -39,6 +43,9 @@ public class Attack {
 		underAttack = bool;
 		if (!broadcast)
 			return;
+		if (!instance.useLiveAttackCounter())
+			return;
+		new LiveAttackCounter(this, 1000);
 	}
 
 	public void addConnection() {
@@ -185,7 +192,8 @@ public class Attack {
 				connectionHash = new HashMap<>();
 				try {
 					Thread.sleep(1000);
-				} catch (InterruptedException error) { }
+				} catch (InterruptedException error) {
+				}
 			}
 		})).start();
 	}

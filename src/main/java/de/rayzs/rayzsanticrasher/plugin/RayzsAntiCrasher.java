@@ -58,9 +58,8 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	private MySQL mysql;
 	private BasicSQL notifySQL;
 	private FileManager mysqlFile, checkFile, configFile;
-	private Boolean useMySQL, validVersion, isSimpleCloud, avaibleLicence = false;
+	private Boolean useMySQL, validVersion, isSimpleCloud, isRunning, liveAttackCounter, avaibleLicence = false;
 	private File thisFile, addonFolder;
-	private Boolean isRunning;
 	private AddonManager addonManager;
 	private String configFilePath, crashReportMessage, standardMessage;
 
@@ -173,6 +172,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	public void loadPlugin() {
 		this.pluginManager = getServer().getPluginManager();
+		liveAttackCounter = Boolean.valueOf(instance.getConfigFile().search("settings.liveAttackCounter").getString("true"));
 		api = new RayzsAntiCrasherAPI(this, version);
 		logger("§8[§4R§cA§4C§8] §7Injecting minecraft server...");
 		serverInjector = new ServerInjector(this);
@@ -269,6 +269,10 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		return ChatColor.translateAlternateColorCodes('&', text);
 	}
 
+	public Boolean useLiveAttackCounter() {
+		return liveAttackCounter;
+	}
+	
 	public Boolean useMySQL() {
 		return useMySQL;
 	}

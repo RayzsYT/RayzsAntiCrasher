@@ -1,6 +1,6 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.server;
 
-import org.bukkit.Bukkit;
+import java.util.List;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import io.netty.channel.Channel;
@@ -52,19 +52,13 @@ public class StartPingAttack extends ServerCheck {
 
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
-					Bukkit.getScheduler().runTaskAsynchronously(getInstance(), new Runnable() {
-						@Override
-						public void run() {
-							if (getAPI().isVPN(clientAddress)) {
-								attack.addBlacklist(clientAddress);
-								getAPI().ipTable(clientAddress, true);
-							}
-						}
-					});
+					attack.addWaiting(clientAddress);
 					channel.flush();
 					channel.close();
 				}
-		} catch (Exception error) { }
+		} catch (Exception error) {
+			return false;
+		}
 		return false;
 	}
 
@@ -74,9 +68,19 @@ public class StartPingAttack extends ServerCheck {
 			while (attack.isUnderAttack()) {
 				if (attack.getConnections() <= saveAmount) {
 					attack.setState(false, true);
-					for (String currentIP : attack.getBlacklist()) {
-						attack.ipTable(currentIP, true);
-						attack.removeBlacklist(currentIP);
+					if (getAPI().doIPTable()) {
+						List<String> tempBlockedIPs = attack.getBlacklist();
+						for (String currentIP : tempBlockedIPs) {
+							attack.ipTable(currentIP, true);
+							attack.removeBlacklist(currentIP);
+						}
+						List<String> tempWaitingIPs = attack.getWaitinglist();
+						for (String currentIP : tempWaitingIPs) {
+							if (!getAPI().isVPN(currentIP))
+								continue;
+							attack.ipTable(currentIP, true);
+							attack.removeWaiting(currentIP);
+						}
 					}
 					return;
 				}

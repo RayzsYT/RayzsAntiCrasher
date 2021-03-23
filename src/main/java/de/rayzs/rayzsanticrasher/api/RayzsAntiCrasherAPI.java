@@ -80,6 +80,8 @@ public class RayzsAntiCrasherAPI {
 	}
 
 	public void ipTable(String address, Boolean bool) {
+		if (!useIPTables)
+			return;
 		if (bool) {
 			new RuntimeExec("iptables -I INPUT -s " + address + " -j DROP");
 			return;
@@ -177,6 +179,10 @@ public class RayzsAntiCrasherAPI {
 	public Boolean existNotify(Player player) {
 		return (notifyHash.get(player.getUniqueId()) != null);
 	}
+	
+	public Boolean doIPTable() {
+		return useIPTables;
+	}
 
 	public Boolean isVPN(String clientAddress) {
 		try {
@@ -215,7 +221,7 @@ public class RayzsAntiCrasherAPI {
 	public void setNotify(Player player, Integer value) {
 		notifyHash.put(player.getUniqueId(), value);
 	}
-	
+
 	public void doNotify(String text, Player player) {
 		if (notifyList.contains(player))
 			return;

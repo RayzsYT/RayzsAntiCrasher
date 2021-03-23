@@ -13,7 +13,8 @@ public class LiveAttackCounter {
 				try {
 					Thread.sleep(time);
 					send();
-				} catch (InterruptedException error) { }
+				} catch (InterruptedException error) {
+				}
 
 		})).start();
 	}
@@ -22,8 +23,9 @@ public class LiveAttackCounter {
 		String text;
 		Integer blacklistSize = attack.getBlacklistSize();
 		Integer totalConnectionsPerSecond = attack.getConnections();
-		text = "§8» §c§nSERVER IS UNDER ATTACK§8! §7Blocked§8-§7IP§8'§7s§8: §b§l§o§n" + blacklistSize + "§8 | §7CPS§8: §b"
-				+ totalConnectionsPerSecond + " §8«";
+		text = "§8» §8[§4§n" + attack.getTaskName()
+				+ "§8] §c§nSERVER IS UNDER ATTACK§8! §7Blocked§8-§7IP§8'§7s§8: §b§l§o§n" + blacklistSize
+				+ "§8 | §7CPS§8: §b" + totalConnectionsPerSecond + " §8«";
 		new Actionbar(text, "rayzsanticrasher.attack");
 	}
 

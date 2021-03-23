@@ -1,7 +1,6 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.server;
 
-import org.bukkit.Bukkit;
-
+import java.util.List;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import io.netty.channel.Channel;
@@ -27,7 +26,7 @@ public class LoginStartAttack extends ServerCheck {
 			String clientAddress = channel.remoteAddress().toString().split(":")[0].replace("/", "");
 			Integer clientConnections = attack.getConnections(clientAddress);
 			Integer totalConnections = attack.getConnections();
-
+			
 			if (attack.isBlacklisted(clientAddress)) {
 				channel.flush();
 				channel.close();
@@ -50,7 +49,6 @@ public class LoginStartAttack extends ServerCheck {
 				channel.flush();
 				channel.close();
 			}
-
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
 					attack.addWaiting(clientAddress);
@@ -58,6 +56,7 @@ public class LoginStartAttack extends ServerCheck {
 					channel.close();
 				}
 		} catch (Exception error) {
+			return false;
 		}
 		return false;
 	}
@@ -66,23 +65,28 @@ public class LoginStartAttack extends ServerCheck {
 		attack.setState(true, true);
 		(new Thread(() -> {
 			while (attack.isUnderAttack()) {
-				Bukkit.getScheduler().runTaskAsynchronously(getInstance(), new Runnable() {
-					@Override
-					public void run() {
-						for (String currentIP : attack.getWaitinglist())
-							if (getAPI().isVPN(currentIP)) {
-								attack.ipTable(currentIP, true);
-								attack.removeWaiting(currentIP);
-							}
-					}
-				});
 				if (attack.getConnections() <= saveAmount) {
 					attack.setState(false, true);
+					if (getAPI().doIPTable()) {
+						List<String> tempBlockedIPs = attack.getBlacklist();
+						for (String currentIP : tempBlockedIPs) {
+							attack.ipTable(currentIP, true);
+							attack.removeBlacklist(currentIP);
+						}
+						List<String> tempWaitingIPs = attack.getWaitinglist();
+						for (String currentIP : tempWaitingIPs) {
+							if (!getAPI().isVPN(currentIP))
+								continue;
+							attack.ipTable(currentIP, true);
+							attack.removeWaiting(currentIP);
+						}
+					}
 					return;
 				}
 				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException error) { }
+					Thread.sleep(1000);
+				} catch (InterruptedException error) {
+				}
 			}
 		})).start();
 	}

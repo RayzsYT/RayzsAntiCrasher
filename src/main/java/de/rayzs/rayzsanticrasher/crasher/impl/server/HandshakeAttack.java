@@ -1,6 +1,6 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.server;
 
-import org.bukkit.Bukkit;
+import java.util.List;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import io.netty.channel.Channel;
@@ -10,18 +10,23 @@ import net.minecraft.server.v1_8_R3.PacketHandshakingInSetProtocol;
 public class HandshakeAttack extends ServerCheck {
 
 	Integer connectionsAllowed, maxConnections, maxSingleConnections;
-	
+
 	public HandshakeAttack() {
 		connectionsAllowed = getFileManager("maxAllowedConnections", this).getInt(8);
 		maxConnections = getFileManager("maxConnections", this).getInt(15);
 		maxSingleConnections = getFileManager("maxSingleConnections", this).getInt(10);
 	}
-	
+
 	@Override
 	public boolean onCheck(Channel channel, String packetName, Packet<?> packet) {
 		if (!(packet instanceof PacketHandshakingInSetProtocol))
 			return false;
 		try {
+			if (channel.remoteAddress() == null) {
+				channel.flush();
+				channel.close();
+				return false;
+			}
 			Attack attack = getAPI().getHandshakeAttack();
 			String clientAddress = channel.remoteAddress().toString().split(":")[0].replace("/", "");
 			Integer clientConnections = attack.getConnections(clientAddress);
@@ -37,7 +42,7 @@ public class HandshakeAttack extends ServerCheck {
 			attack.addConnection();
 
 			if (!attack.isUnderAttack()) {
-				if (totalConnections >= totalConnections) {
+				if (totalConnections >= maxConnections) {
 					onAttack(attack, connectionsAllowed);
 					return false;
 				}
@@ -52,19 +57,13 @@ public class HandshakeAttack extends ServerCheck {
 
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
-					Bukkit.getScheduler().runTaskAsynchronously(getInstance(), new Runnable() {
-						@Override
-						public void run() {
-							if (getAPI().isVPN(clientAddress)) {
-								attack.addBlacklist(clientAddress);
-								getAPI().ipTable(clientAddress, true);
-							}
-						}
-					});
+					attack.addWaiting(clientAddress);
 					channel.flush();
 					channel.close();
 				}
-		} catch (Exception error) { }
+		} catch (Exception error) {
+			return false;
+		}
 		return false;
 	}
 
@@ -74,15 +73,26 @@ public class HandshakeAttack extends ServerCheck {
 			while (attack.isUnderAttack()) {
 				if (attack.getConnections() <= saveAmount) {
 					attack.setState(false, true);
-					for (String currentIP : attack.getBlacklist()) {
-						attack.ipTable(currentIP, true);
-						attack.removeBlacklist(currentIP);
+					if (getAPI().doIPTable()) {
+						List<String> tempBlockedIPs = attack.getBlacklist();
+						for (String currentIP : tempBlockedIPs) {
+							attack.ipTable(currentIP, true);
+							attack.removeBlacklist(currentIP);
+						}
+						List<String> tempWaitingIPs = attack.getWaitinglist();
+						for (String currentIP : tempWaitingIPs) {
+							if (!getAPI().isVPN(currentIP))
+								continue;
+							attack.ipTable(currentIP, true);
+							attack.removeWaiting(currentIP);
+						}
 					}
 					return;
 				}
 				try {
 					Thread.sleep(1000);
-				} catch (InterruptedException error) { }
+				} catch (InterruptedException error) {
+				}
 			}
 		})).start();
 	}
