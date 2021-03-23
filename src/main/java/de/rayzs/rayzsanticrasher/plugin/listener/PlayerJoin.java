@@ -16,10 +16,15 @@ public class PlayerJoin implements Listener {
 
 	private RayzsAntiCrasher instance;
 	private RayzsAntiCrasherAPI api;
-
+	private Integer addToWhitelistTime;
+	
 	public PlayerJoin() {
 		instance = RayzsAntiCrasher.getInstance();
 		api = RayzsAntiCrasher.getAPI();
+		addToWhitelistTime = instance
+				.getCheckFile().search("settings.listener."
+						+ this.getClass().getSimpleName().toLowerCase().split("@")[0] + "." + "addToWhitelistTime")
+				.getInt(40);
 		instance.registerEvent(this);
 	}
 
@@ -71,6 +76,6 @@ public class PlayerJoin implements Listener {
 					api.getPingStatusAttack().addWhitelist(clientAddress);
 				}
 			}
-		}, 20 * 5);
+		}, addToWhitelistTime);
 	}
 }

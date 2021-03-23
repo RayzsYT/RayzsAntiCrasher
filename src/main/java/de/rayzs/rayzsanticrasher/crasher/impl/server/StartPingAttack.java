@@ -52,7 +52,7 @@ public class StartPingAttack extends ServerCheck {
 
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
-					attack.addWaiting(clientAddress);
+					if (!attack.isWaiting(clientAddress)) attack.addWaiting(clientAddress);
 					channel.flush();
 					channel.close();
 				}
@@ -63,31 +63,31 @@ public class StartPingAttack extends ServerCheck {
 	}
 
 	private void onAttack(Attack attack, Integer saveAmount) {
-		attack.setState(true, true);
+		attack.setState(true);
 		(new Thread(() -> {
 			while (attack.isUnderAttack()) {
-				if (attack.getConnections() <= saveAmount) {
-					attack.setState(false, true);
-					if (getAPI().doIPTable()) {
-						List<String> tempBlockedIPs = attack.getBlacklist();
-						for (String currentIP : tempBlockedIPs) {
-							attack.ipTable(currentIP, true);
-							attack.removeBlacklist(currentIP);
-						}
-						List<String> tempWaitingIPs = attack.getWaitinglist();
-						for (String currentIP : tempWaitingIPs) {
-							if (!getAPI().isVPN(currentIP))
-								continue;
-							attack.ipTable(currentIP, true);
-							attack.removeWaiting(currentIP);
-						}
+				if (getAPI().doIPTable()) {
+					List<String> tempBlockedIPs = attack.getBlacklist();
+					for (String currentAddress : tempBlockedIPs) {
+						attack.ipTable(currentAddress, true);
+						attack.removeBlacklist(currentAddress);
 					}
+					List<String> tempWaitingIPs = attack.getWaitinglist();
+					for (String currentAddress : tempWaitingIPs) {
+						if (!getAPI().isVPN(currentAddress)) {
+							attack.addWhitelist(currentAddress);
+							attack.removeWaiting(currentAddress);
+							continue;
+						}
+						attack.ipTable(currentAddress, true);
+						attack.removeWaiting(currentAddress);
+					}
+				}
+				if (attack.getConnections() <= saveAmount) {
+					attack.setState(false);
 					return;
 				}
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException error) {
-				}
+				try { Thread.sleep(1000); } catch (InterruptedException error) { }
 			}
 		})).start();
 	}

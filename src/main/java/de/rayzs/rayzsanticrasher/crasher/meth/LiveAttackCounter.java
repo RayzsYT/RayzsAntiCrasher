@@ -1,12 +1,15 @@
 package de.rayzs.rayzsanticrasher.crasher.meth;
 
 import de.rayzs.rayzsanticrasher.actionbar.Actionbar;
+import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 
 public class LiveAttackCounter {
 
+	private RayzsAntiCrasher instance;
 	private Attack attack;
 
 	public LiveAttackCounter(Attack attack, Integer time) {
+		instance = RayzsAntiCrasher.getInstance();
 		this.attack = attack;
 		(new Thread(() -> {
 			while (attack.isUnderAttack())
@@ -21,11 +24,7 @@ public class LiveAttackCounter {
 
 	private void send() {
 		String text;
-		Integer blacklistSize = attack.getBlacklistSize();
-		Integer totalConnectionsPerSecond = attack.getConnections();
-		text = "§8» §8[§4§n" + attack.getTaskName()
-				+ "§8] §c§nSERVER IS UNDER ATTACK§8! §7Blocked§8-§7IP§8'§7s§8: §b§l§o§n" + blacklistSize
-				+ "§8 | §7CPS§8: §b" + totalConnectionsPerSecond + " §8«";
+		text = instance.getLiveAttackMessage(attack);
 		new Actionbar(text, "rayzsanticrasher.attack");
 	}
 

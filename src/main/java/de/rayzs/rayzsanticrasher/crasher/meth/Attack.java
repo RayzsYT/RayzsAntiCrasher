@@ -39,13 +39,11 @@ public class Attack {
 		Bukkit.getScheduler().cancelTask(task);
 	}
 
-	public void setState(Boolean bool, Boolean broadcast) {
+	public void setState(Boolean bool) {
 		underAttack = bool;
-		if (!broadcast)
-			return;
-		if (!instance.useLiveAttackCounter())
-			return;
-		new LiveAttackCounter(this, 1000);
+		if (bool)
+			if (instance.useLiveAttackCounter())
+				new LiveAttackCounter(this, 1000);
 	}
 
 	public void addConnection() {

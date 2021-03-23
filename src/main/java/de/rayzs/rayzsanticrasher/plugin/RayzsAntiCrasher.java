@@ -27,8 +27,8 @@ import de.rayzs.rayzsanticrasher.crasher.impl.client.SignUpdater;
 import de.rayzs.rayzsanticrasher.crasher.impl.client.Spectate;
 import de.rayzs.rayzsanticrasher.crasher.impl.client.TabComplete;
 import de.rayzs.rayzsanticrasher.crasher.impl.client.WindowClicker;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.BotJoin;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.VPNJoin;
+import de.rayzs.rayzsanticrasher.crasher.impl.listener.VPNCheck;
+import de.rayzs.rayzsanticrasher.crasher.impl.listener.BotCheck;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.ChunkOverflower;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalEndTeleport;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalCommand;
@@ -42,6 +42,7 @@ import de.rayzs.rayzsanticrasher.crasher.impl.server.InstantCrasher;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.LoginStartAttack;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.StartPingAttack;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.StatusPingAttack;
+import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import de.rayzs.rayzsanticrasher.file.FileManager;
 import de.rayzs.rayzsanticrasher.server.ServerInjector;
 import de.rayzs.rayzsanticrasher.spigotmc.UpdateChecker;
@@ -52,7 +53,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.3";
+	private String version = "2.1.4";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
@@ -61,7 +62,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	private Boolean useMySQL, validVersion, isSimpleCloud, isRunning, liveAttackCounter, avaibleLicence = false;
 	private File thisFile, addonFolder;
 	private AddonManager addonManager;
-	private String configFilePath, crashReportMessage, standardMessage;
+	private String configFilePath, crashReportMessage, standardMessage, liveAttackMessage;
 
 	@Override
 	public void onDisable() {
@@ -149,8 +150,8 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		api.addCheck(new IllegalEndTeleport());
 		api.addCheck(new IllegalSign());
 		api.addCheck(new ChunkOverflower());
-		api.addCheck(new VPNJoin());
-		api.addCheck(new BotJoin());
+		api.addCheck(new VPNCheck());
+		api.addCheck(new BotCheck());
 		api.addCheck(new IllegalItemDrop());
 		api.addCheck(new IllegalMovement());
 		api.addCheck(new IllegalEntitySpawn());
@@ -203,6 +204,8 @@ public class RayzsAntiCrasher extends JavaPlugin {
 				.getString("&7&8[&9R&bA&9C&8] &b%CLIENT% &8| &b%DETECTION% %AMOUNT%&9x &b&n&o%PACKET%");
 		standardMessage = instance.getConfigFile().search("messages.informations")
 				.getString("&7This server is using &9Rayzs&bAnti&9Crasher &8- &b&l&nv%VERSION%&8.");
+		liveAttackMessage = instance.getConfigFile().search("messages.liveattack")
+				.getString("§8>> §8[§4§n%ATTACK%§8] §c§nSERVER IS UNDER ATTACK§8! §7Blocked§8-§7IP§8'§7s§8: §b§l§o§n%BLOCKED%§8 | §7CPS§8: §b%CPS% §8<<");
 	}
 
 	public static RayzsAntiCrasher getInstance() {
@@ -266,6 +269,12 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	public String getCrashReportMessage(String client, Integer amount, String check, String packet) {
 		final String text = (crashReportMessage.replace("%CLIENT%", client).replace("%AMOUNT%", amount.toString())
 				.replace("%DETECTION%", check).replace("%PACKET%", packet));
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+	
+	public String getLiveAttackMessage(Attack attack) {
+		final String text = (liveAttackMessage.replace("%CPS%", attack.getConnections().toString())
+				.replace("%ATTACK%", attack.getTaskName()).replace("%BLOCKED%", attack.getBlacklist().size() + ""));
 		return ChatColor.translateAlternateColorCodes('&', text);
 	}
 
