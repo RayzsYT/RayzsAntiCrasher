@@ -1,6 +1,5 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.server;
 
-import java.util.List;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import io.netty.channel.Channel;
@@ -10,13 +9,13 @@ import net.minecraft.server.v1_8_R3.PacketLoginInStart;
 public class LoginStartAttack extends ServerCheck {
 
 	Integer connectionsAllowed, maxConnections, maxSingleConnections;
-	
+
 	public LoginStartAttack() {
 		connectionsAllowed = getFileManager("maxAllowedConnections", this).getInt(8);
 		maxConnections = getFileManager("maxConnections", this).getInt(10);
 		maxSingleConnections = getFileManager("maxSingleConnections", this).getInt(10);
 	}
-	
+
 	@Override
 	public boolean onCheck(Channel channel, String packetName, Packet<?> packet) {
 		if (!(packet instanceof PacketLoginInStart))
@@ -26,7 +25,7 @@ public class LoginStartAttack extends ServerCheck {
 			String clientAddress = channel.remoteAddress().toString().split(":")[0].replace("/", "");
 			Integer clientConnections = attack.getConnections(clientAddress);
 			Integer totalConnections = attack.getConnections();
-			
+
 			if (attack.isBlacklisted(clientAddress)) {
 				channel.flush();
 				channel.close();
@@ -51,7 +50,8 @@ public class LoginStartAttack extends ServerCheck {
 			}
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
-					if (!attack.isWaiting(clientAddress)) attack.addWaiting(clientAddress);
+					if (!attack.isWaiting(clientAddress))
+						attack.addWaiting(clientAddress);
 					channel.flush();
 					channel.close();
 				}
@@ -62,17 +62,26 @@ public class LoginStartAttack extends ServerCheck {
 	}
 
 	private void onAttack(Attack attack, Integer saveAmount) {
+		
+		if(attack.isUnderAttack())
+			return;
+		
 		attack.setState(true);
 		(new Thread(() -> {
 			while (attack.isUnderAttack()) {
-				if (getAPI().doIPTable()) {
-					List<String> tempBlockedIPs = attack.getBlacklist();
-					for (String currentAddress : tempBlockedIPs) {
+				if (attack.getConnections() <= saveAmount) {
+					attack.setState(false);
+					return;
+				}
+				try {
+				if (!attack.getBlacklist().isEmpty()) {
+					for (String currentAddress : attack.getBlacklist()) {
 						attack.ipTable(currentAddress, true);
 						attack.removeBlacklist(currentAddress);
 					}
-					List<String> tempWaitingIPs = attack.getWaitinglist();
-					for (String currentAddress : tempWaitingIPs) {
+				}
+				if (!attack.getWaitinglist().isEmpty()) {
+					for (String currentAddress : attack.getWhitelist()) {
 						if (!getAPI().isVPN(currentAddress)) {
 							attack.addWhitelist(currentAddress);
 							attack.removeWaiting(currentAddress);
@@ -82,10 +91,7 @@ public class LoginStartAttack extends ServerCheck {
 						attack.removeWaiting(currentAddress);
 					}
 				}
-				if (attack.getConnections() <= saveAmount) {
-					attack.setState(false);
-					return;
-				}
+				}catch (Exception error) {}
 				try { Thread.sleep(1000); } catch (InterruptedException error) { }
 			}
 		})).start();

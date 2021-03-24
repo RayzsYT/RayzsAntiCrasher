@@ -41,7 +41,7 @@ public class Attack {
 
 	public void setState(Boolean bool) {
 		underAttack = bool;
-		if (bool)
+		if (bool && taskName.equals("Handshake"))
 			if (instance.useLiveAttackCounter())
 				new LiveAttackCounter(this, 1000);
 	}

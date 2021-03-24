@@ -17,6 +17,7 @@ import de.rayzs.rayzsanticrasher.notify.Notify;
 import de.rayzs.rayzsanticrasher.player.CrashPlayer;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 import de.rayzs.rayzsanticrasher.runtime.RuntimeExec;
+import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class RayzsAntiCrasherAPI {
@@ -102,6 +103,15 @@ public class RayzsAntiCrasherAPI {
 	public void createCustomReport(Player player, Class<?> clazz, String reason) {
 		doNotify("§8[§9R§bA§9C§8] §b" + player.getName() + " §8» §b" + clazz.getSimpleName() + " §8┊┊ §b" + reason,
 				player);
+	}
+	
+	public void disconnectChannel(Channel channel) {
+		String clientAddress = channel.remoteAddress().toString().split(":")[0].replace("/", "");
+		channel.flush();
+		channel.close();
+		ipTable(clientAddress, true);
+		try { Thread.sleep(1000); } catch (InterruptedException error) { if(instance.useDebug()) error.printStackTrace(); }
+		ipTable(clientAddress, false);
 	}
 
 	public void addCheck(ClientCheck clientCheck) {

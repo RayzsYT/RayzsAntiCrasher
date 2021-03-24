@@ -25,7 +25,7 @@ public class BlockDig extends ClientCheck {
 			PacketPlayInBlockDig blockDig = (PacketPlayInBlockDig) packet;
 			if (blockDig.a() == null || blockDig.b() == null || blockDig.c() == null)
 				return true;
-		} catch (Exception error) { }
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

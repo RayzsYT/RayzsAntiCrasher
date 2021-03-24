@@ -9,8 +9,7 @@ import net.minecraft.server.v1_8_R3.Packet;
 
 public class Other extends ClientCheck {
 
-	private Integer filteredMax;
-	private Integer unfilteredMax;
+	private Integer filteredMax, unfilteredMax;
 	private List<String> packetList;
 
 	public Other() {
@@ -44,8 +43,7 @@ public class Other extends ClientCheck {
 			}
 			if (amount > unfilteredMax)
 				return true;
-		} catch (Exception error) {
-		}
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

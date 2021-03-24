@@ -26,7 +26,7 @@ public class Chat extends ClientCheck {
 				return true;
 			if (amount > max)
 				return true;
-		} catch (Exception error) { }
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

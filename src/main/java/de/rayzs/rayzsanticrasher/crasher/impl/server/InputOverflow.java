@@ -29,6 +29,7 @@ public class InputOverflow extends ByteToMessageDecoder {
 			}
 			String clientAddress = channel.channel().remoteAddress().toString().split(":")[0].replace("/", "");
 			if (byteBuf.array().length > 5000) {
+				api.disconnectChannel(channel.channel());
 				channel.flush();
 				channel.close();
 				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(clientAddress, byteBuf.array().length,

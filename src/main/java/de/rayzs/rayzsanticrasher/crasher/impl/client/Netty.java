@@ -1,5 +1,6 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.client;
 
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
@@ -16,8 +17,8 @@ public class Netty extends ClientCheck {
 
 	public Netty() {
 		max = getFileManager("max", this).getInt(5000);
-		bookCheck = getFileManager("bookCheck", this).getBoolean(true);
-		invalidItemCheck = getFileManager("invalidItemCheck", this).getBoolean(true);
+		bookCheck = Boolean.parseBoolean(getFileManager("bookCheck", this).getString("true"));
+		invalidItemCheck = Boolean.parseBoolean(getFileManager("invalidItemCheck", this).getString("true"));
 	}
 
 	@Override
@@ -27,19 +28,25 @@ public class Netty extends ClientCheck {
 		try {
 			PacketPlayInBlockPlace blockPlace = (PacketPlayInBlockPlace) packet;
 			net.minecraft.server.v1_8_R3.ItemStack stack = blockPlace.getItemStack();
-			if (stack.getTag() == null)
-				return false;
+			if(stack == null) return false;
+			if (stack.getTag() == null) return false;
 			if (stack.getTag().toString().length() > max) {
-				player.getInventory().removeItem(player.getItemInHand());
-				return true;
+				channel.close();
+				return true;	
 			}
 			CraftItemStack craftStack = CraftItemStack.asNewCraftStack(stack.getItem());
-			if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType().toString().contains("BOOK") && bookCheck)
-				return true;
-			if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType() != player.getItemInHand().getType()
-					&& invalidItemCheck)
-				return true;
-		} catch (Exception error) { }
+			if (bookCheck)
+				if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType().equals(Material.BOOK_AND_QUILL)) {
+					channel.close();
+					return true;
+				}
+			if (invalidItemCheck) {
+				if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType() != player.getItemInHand().getType()) {
+					channel.close();
+					return true;
+				}
+			}
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

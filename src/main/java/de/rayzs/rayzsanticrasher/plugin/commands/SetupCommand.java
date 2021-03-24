@@ -141,35 +141,8 @@ public class SetupCommand implements CommandExecutor {
 			}
 			return true;
 		}
-		
-		if (command.equals("edit")) {
-			if (!sender.hasPermission("rayzsanticrasher.edit")) {
-				sender.sendMessage("§8[§4R§cA§4C§8] §7You§8'§7re not allowed to execute that§8!");
-				return false;
-			}
-			if (args.length != 3) {
-				sendHelp(sender);
-				return true;
-			}
-			String check = "checks." + args[1].toLowerCase();
-			if (instance.getCheckFile().getYAML().getString(check) == null) {
-				sender.sendMessage("§8[§9R§bA§9C§8] §7This is §cnot §7editable§8!");
-				return true;
-			}
-			sender.sendMessage("§8[§9R§bA§9C§8] §7You edited the §echecks.yml§8!");
-			try {
-				Integer value = Integer.parseInt(args[2]);
-				instance.getCheckFile().set(check, value);
-				return true;
-			} catch (Exception error) {
-			}
-			String value = args[2];
-			if (value.equals("true") || value.equals("false"))
-				instance.getCheckFile().set(check, value);
-			return true;
-		}
 		if (command.equals("addons")) {
-			if (!sender.hasPermission("rayzsanticrasher.addon")) {
+			if (!sender.hasPermission("rayzsanticrasher.addons")) {
 				sender.sendMessage("§8[§4R§cA§4C§8] §7You§8'§7re not allowed to execute that§8!");
 				return false;
 			}
@@ -201,10 +174,9 @@ public class SetupCommand implements CommandExecutor {
 		sender.sendMessage("§8 - §8/§9rac §b" + "checks");
 		sender.sendMessage("§8 - §8/§9rac §b" + "tps");
 		sender.sendMessage("§8 - §8/§9rac §b" + "addons");
-		sender.sendMessage("§8 - §8/§9rac §b" + "edit [check] [value]");
 	}
-
-	private double round(double wert, int stellen) {
-		return Math.round(wert * Math.pow(10, stellen)) / Math.pow(10, stellen);
+	
+	private double round(double time, int much) {
+		return Math.round(time * Math.pow(10, much)) / Math.pow(10, much);
 	}
 }

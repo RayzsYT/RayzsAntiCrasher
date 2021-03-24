@@ -99,7 +99,7 @@ public class Addon {
 	@SuppressWarnings({ "deprecation" })
 	private void interactAddon(String methode)
 			throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException,
-			InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
 		ClassLoader classLoader = URLClassLoader.newInstance(new URL[] { file.toURI().toURL() },
 				getClass().getClassLoader());
 		Class<?> clazz = classLoader.loadClass(mainPath);

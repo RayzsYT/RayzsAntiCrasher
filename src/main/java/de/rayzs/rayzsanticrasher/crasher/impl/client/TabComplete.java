@@ -26,7 +26,7 @@ public class TabComplete extends ClientCheck {
 			String input = tabComplete.a();
 			if (input == null)
 				return true;
-		} catch (Exception error) { }
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

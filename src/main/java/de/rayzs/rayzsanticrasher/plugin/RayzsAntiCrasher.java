@@ -40,12 +40,15 @@ import de.rayzs.rayzsanticrasher.crasher.impl.listener.InvalidInteraction;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.HandshakeAttack;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.InstantCrasher;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.LoginStartAttack;
+import de.rayzs.rayzsanticrasher.crasher.impl.server.OnlyProxyPing;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.StartPingAttack;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.StatusPingAttack;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import de.rayzs.rayzsanticrasher.file.FileManager;
 import de.rayzs.rayzsanticrasher.server.ServerInjector;
 import de.rayzs.rayzsanticrasher.spigotmc.UpdateChecker;
+import net.minecraft.server.v1_8_R3.DedicatedServer;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 import de.rayzs.rayzsanticrasher.database.sql.BasicSQL;
 import de.rayzs.rayzsanticrasher.database.sql.MySQL;
 
@@ -53,13 +56,13 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.4";
+	private String version = "2.1.5";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
 	private BasicSQL notifySQL;
 	private FileManager mysqlFile, checkFile, configFile;
-	private Boolean useMySQL, validVersion, isSimpleCloud, isRunning, liveAttackCounter, avaibleLicence = false;
+	private Boolean useMySQL, validVersion, isSimpleCloud, isRunning, liveAttackCounter, debug, recommentedServerConfiguration, avaibleLicence = false;
 	private File thisFile, addonFolder;
 	private AddonManager addonManager;
 	private String configFilePath, crashReportMessage, standardMessage, liveAttackMessage;
@@ -125,6 +128,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		api.addCheck(new LoginStartAttack());
 		api.addCheck(new StartPingAttack());
 		api.addCheck(new StatusPingAttack());
+		api.addCheck(new OnlyProxyPing());
 		// }
 
 		// CLIENT {
@@ -174,6 +178,8 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	public void loadPlugin() {
 		this.pluginManager = getServer().getPluginManager();
 		liveAttackCounter = Boolean.valueOf(instance.getConfigFile().search("settings.liveAttackCounter").getString("true"));
+		debug = Boolean.valueOf(instance.getConfigFile().search("settings.debugMode").getString("true"));
+		recommentedServerConfiguration = Boolean.valueOf(instance.getConfigFile().search("settings.recommentedServerConfiguration").getString("true"));
 		api = new RayzsAntiCrasherAPI(this, version);
 		logger("§8[§4R§cA§4C§8] §7Injecting minecraft server...");
 		serverInjector = new ServerInjector(this);
@@ -195,17 +201,34 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		loadAllPlayers();
 		logger("§8[§4R§cA§4C§8] §7Loading properties...");
 		loadPropeties();
+		if(recommentedServerConfiguration) {
+			logger("§8[§4R§cA§4C§8] §7Loading recommented server configuration...");
+			loadRecommentedServerConfiguration();
+			logger("§8[§4R§cA§4C§8] §7Done!");
+		}
 		logger("§8[§4R§cA§4C§8] §7The plugin could be loaded §asuccessfully§8!");
 		addonManager.loadAddons();
 	}
-
-	private void loadPropeties() {
+	
+	private void loadRecommentedServerConfiguration() {
+		String serverVersion = getServer().getVersion();
+		if(serverVersion.contains("PaperSpigot")) {
+			String searching = "use-native-transport";
+			Boolean result = Boolean.parseBoolean(getServerPropeties(searching).toString());
+			if(!result) return;
+			setServerPropeties(searching, false);
+		}else
+			logger("§8[§4R§cA§4C§8] §7We recomment you to use §bPaperSpigot §7as your new server version§8!");
+	}
+	
+	protected void loadPropeties() {
 		crashReportMessage = instance.getConfigFile().search("messages.crashreport")
 				.getString("&7&8[&9R&bA&9C&8] &b%CLIENT% &8| &b%DETECTION% %AMOUNT%&9x &b&n&o%PACKET%");
 		standardMessage = instance.getConfigFile().search("messages.informations")
 				.getString("&7This server is using &9Rayzs&bAnti&9Crasher &8- &b&l&nv%VERSION%&8.");
 		liveAttackMessage = instance.getConfigFile().search("messages.liveattack")
-				.getString("§8>> §8[§4§n%ATTACK%§8] §c§nSERVER IS UNDER ATTACK§8! §7Blocked§8-§7IP§8'§7s§8: §b§l§o§n%BLOCKED%§8 | §7CPS§8: §b%CPS% §8<<");
+				.getString("&8>> &8[&4&n%ATTACK%&8] &c&nSERVER IS UNDER ATTACK&8! &7Blocked&8-&7IP&8'&7s&8: &b&l&o&n%BLOCKED%&8 | &7CPS&8: &b%CPS% &8<<");
+		logger("§8[§4R§cA§4C§8] §7Done!");
 	}
 
 	public static RayzsAntiCrasher getInstance() {
@@ -224,7 +247,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		HandlerList.unregisterAll(listener);
 	}
 
-	private void loadAllPlayers() {
+	protected void loadAllPlayers() {
 		for (Player players : Bukkit.getOnlinePlayers()) {
 			if (!api.existCrashPlayer(players))
 				api.createCrashPlayer(players);
@@ -285,6 +308,10 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	public Boolean useMySQL() {
 		return useMySQL;
 	}
+	
+	public Boolean useDebug() {
+		return debug;
+	}
 
 	public Boolean isSimpleCloud() {
 		return isSimpleCloud;
@@ -309,8 +336,17 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	public ServerInjector getServerInjector() {
 		return this.serverInjector;
 	}
-
-	private void loadSQL() {
+	
+	public Object getServerPropeties(String property) {
+		return ((DedicatedServer) MinecraftServer.getServer()).propertyManager.properties.get(property);
+	}
+	
+	public void setServerPropeties(String property, Object object) {
+	   ((DedicatedServer) MinecraftServer.getServer()).propertyManager.setProperty(property, object);
+	   ((DedicatedServer) MinecraftServer.getServer()).propertyManager.savePropertiesFile();
+	}
+	
+	protected void loadSQL() {
 		try {
 			notifySQL = new BasicSQL("RayzsAntiCrasher", "UUID text, NOTIFY integer", "'" + 1 + "'");
 		} catch (Exception error) {

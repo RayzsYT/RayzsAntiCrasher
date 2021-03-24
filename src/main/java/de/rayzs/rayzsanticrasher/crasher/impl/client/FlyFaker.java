@@ -18,11 +18,10 @@ public class FlyFaker extends ClientCheck {
 			Boolean isFlying = inAbilities.isFlying();
 			if (isFlying == true && player.getGameMode() != GameMode.CREATIVE) {
 				if (!player.getAllowFlight()) {
-					System.err.println(1);
 					return true;
 				}
 			}
-		} catch (Exception error) { }
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

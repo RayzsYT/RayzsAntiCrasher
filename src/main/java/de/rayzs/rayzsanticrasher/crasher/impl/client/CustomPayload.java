@@ -28,7 +28,7 @@ public class CustomPayload extends ClientCheck {
 				if (amount > max)
 					return true;
 			}
-		} catch (Exception error) { }
+		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}
 }

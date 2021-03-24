@@ -90,20 +90,19 @@ public class CrashPlayer {
 	private void inject() {
 		try {
 			channel = craftplayer.getHandle().playerConnection.networkManager.channel;
-			channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Packet<?>>() {
-				@Override
-				protected void decode(ChannelHandlerContext arg0, Packet<?> packet, List<Object> arg2)
-						throws Exception {
-					arg2.add(packet);
-					readPackets(packet);
-				}
-			});
-
 			if (channel.pipeline().get("decompress") != null)
 				channel.pipeline().addAfter("decompress", "cf_decompress", new InputOverflow(craftplayer));
 			else
 				channel.pipeline().addAfter("splitter", "cf_decompress", new InputOverflow(craftplayer));
-			;
+			
+			channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Packet<?>>() {
+				@Override
+				protected void decode(ChannelHandlerContext channelHandler, Packet<?> packet, List<Object> objects)
+						throws Exception {
+					objects.add(packet);
+					readPackets(packet);
+				}
+			});
 		} catch (Exception error) { }
 	}
 
