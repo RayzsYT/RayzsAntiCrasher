@@ -58,59 +58,73 @@ public class BotCheck implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		CraftPlayer craftPlayer = (CraftPlayer) player;
-		String clientAddress = player.getAddress().getAddress().getHostAddress();
-		Integer ping = craftPlayer.getHandle().ping;
-		if (ping < 1)
-			ping = 1;
-		HashMap<Player, Location> playerLocationHash = new HashMap<>();
-		(new BukkitRunnable() {
-			public void run() {
-				player.teleport(new Location(player.getWorld(), player.getLocation().getX(),
-						(player.getLocation().getY()) + (0.05), player.getLocation().getZ(),
-						player.getLocation().getYaw(), player.getLocation().getPitch()));
-				playerLocationHash.put(player, player.getLocation());
-			}
-		}).runTaskLater(instance, getDuraction(ping, teleportDuration));
-		(new BukkitRunnable() {
-			public void run() {
-				if (player.getLocation().equals(playerLocationHash.get(player))) {
-					craftPlayer.getHandle().playerConnection.networkManager.channel.close();
-					if (broadcastReport)
-						new Notify(RayzsAntiCrasher.getInstance(), RayzsAntiCrasher.getAPI()).send(
-								"§8[§9R§bA§9C§8] §b" + player.getName() + "§7 got §cdetected §7playing as a bot§8!");
-					if (blockPlayer)
-						isIlleagel(clientAddress);
+		try {
+			Player player = event.getPlayer();
+			CraftPlayer craftPlayer = (CraftPlayer) player;
+			String clientAddress = player.getAddress().getAddress().getHostAddress();
+			Integer ping = craftPlayer.getHandle().ping;
+			if (ping < 1)
+				ping = 1;
+			HashMap<Player, Location> playerLocationHash = new HashMap<>();
+			(new BukkitRunnable() {
+				public void run() {
+					player.teleport(new Location(player.getWorld(), player.getLocation().getX(),
+							(player.getLocation().getY()) + (0.05), player.getLocation().getZ(),
+							player.getLocation().getYaw(), player.getLocation().getPitch()));
+					playerLocationHash.put(player, player.getLocation());
 				}
-			}
-		}).runTaskLater(instance, getDuraction(ping, checkDuration));
+			}).runTaskLater(instance, getDuraction(ping, teleportDuration));
+			(new BukkitRunnable() {
+				public void run() {
+					if (player.getLocation().equals(playerLocationHash.get(player))) {
+						craftPlayer.getHandle().playerConnection.networkManager.channel.close();
+						if (broadcastReport)
+							new Notify(RayzsAntiCrasher.getInstance(), RayzsAntiCrasher.getAPI()).send(
+									"§8[§9R§bA§9C§8] §b" + player.getName() + "§7 got §cdetected §7playing as a bot§8!");
+						if (blockPlayer)
+							isIlleagel(clientAddress);
+					}
+				}
+			}).runTaskLater(instance, getDuraction(ping, checkDuration));
+		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		if (canChatBeforeCheck)
 			return;
-		final Player player = event.getPlayer();
-		final String clientAddress = player.getAddress().getAddress().getHostAddress();
-		if (api.getLoginAttack().isWhitelisted(clientAddress) && api.getHandshakeAttack().isWhitelisted(clientAddress)
-				&& api.getPingAttack().isWhitelisted(clientAddress)
-				&& api.getPingStatusAttack().isWhitelisted(clientAddress))
-			return;
-		event.setCancelled(true);
+		try {
+			final Player player = event.getPlayer();
+			final String clientAddress = player.getAddress().getAddress().getHostAddress();
+			if(api.getHandshakeAttack().isWhitelisted(clientAddress)) 
+				return;
+			if(api.getLoginAttack().isWhitelisted(clientAddress))
+				return;
+			if(api.getPingAttack().isWhitelisted(clientAddress))
+				return;
+			if(api.getPingStatusAttack().isWhitelisted(clientAddress))
+				return;
+			event.setCancelled(true);
+		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (canExecuteBeforeCheck)
 			return;
-		final Player player = event.getPlayer();
-		final String clientAddress = player.getAddress().getAddress().getHostAddress();
-		if (api.getLoginAttack().isWhitelisted(clientAddress) && api.getHandshakeAttack().isWhitelisted(clientAddress)
-				&& api.getPingAttack().isWhitelisted(clientAddress)
-				&& api.getPingStatusAttack().isWhitelisted(clientAddress))
-			return;
-		event.setCancelled(true);
+		try {
+			final Player player = event.getPlayer();
+			final String clientAddress = player.getAddress().getAddress().getHostAddress();
+			if(api.getHandshakeAttack().isWhitelisted(clientAddress)) 
+				return;
+			if(api.getLoginAttack().isWhitelisted(clientAddress))
+				return;
+			if(api.getPingAttack().isWhitelisted(clientAddress))
+				return;
+			if(api.getPingStatusAttack().isWhitelisted(clientAddress))
+				return;
+			event.setCancelled(true);
+		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
 	}
 
 	private Integer getDuraction(Integer ping, Integer duration) {

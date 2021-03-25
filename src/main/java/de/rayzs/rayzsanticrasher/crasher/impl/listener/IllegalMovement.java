@@ -25,14 +25,16 @@ public class IllegalMovement implements Listener {
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
-		Player player = event.getPlayer();
-		Location fromLocation = event.getFrom();
-		Location toLocation = event.getTo();
-		if(fromLocation.distance(toLocation) > distance) {
-			player.teleport(fromLocation);
-			event.setCancelled(true);
-			((CraftPlayer)player).getHandle().playerConnection.networkManager.channel.close();
-			api.createCustomReport(player, this.getClass(), "Too big distance!");
-		}
+		try {
+			Player player = event.getPlayer();
+			Location fromLocation = event.getFrom();
+			Location toLocation = event.getTo();
+			if(fromLocation.distance(toLocation) > distance) {
+				player.teleport(fromLocation);
+				event.setCancelled(true);
+				((CraftPlayer)player).getHandle().playerConnection.networkManager.channel.close();
+				api.createCustomReport(player, this.getClass(), "Too big distance!");
+			}
+		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
 	}
 }

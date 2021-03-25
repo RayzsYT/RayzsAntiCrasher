@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
-
-import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 import de.rayzs.rayzsanticrasher.runtime.RuntimeExec;
 
 public class Attack {
 
-	private RayzsAntiCrasher instance;
 	private String taskName;
 	private List<String> whiteList, blackList, waitingList;
 	private HashMap<String, Integer> connectionHash;
@@ -18,7 +15,6 @@ public class Attack {
 	private Boolean isRunning, underAttack, useIPTable;
 
 	public Attack(String taskName, Boolean useIPTable) {
-		instance = RayzsAntiCrasher.getInstance();
 		this.taskName = taskName;
 		underAttack = false;
 		this.useIPTable = useIPTable;
@@ -41,9 +37,6 @@ public class Attack {
 
 	public void setState(Boolean bool) {
 		underAttack = bool;
-		if (bool && taskName.equals("Handshake"))
-			if (instance.useLiveAttackCounter())
-				new LiveAttackCounter(this, 1000);
 	}
 
 	public void addConnection() {

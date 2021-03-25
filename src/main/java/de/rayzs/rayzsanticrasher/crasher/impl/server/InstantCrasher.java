@@ -16,8 +16,7 @@ public class InstantCrasher extends ServerCheck {
 				channel.flush();
 				channel.close();
 			}
-		} catch (Exception error) {
-		}
+		}catch (Exception error) {  }
 		try {
 			if (packet instanceof PacketHandshakingInSetProtocol) {
 				PacketHandshakingInSetProtocol inSetProtocol = (PacketHandshakingInSetProtocol) packet;
@@ -58,7 +57,7 @@ public class InstantCrasher extends ServerCheck {
 					getAPI().ipTable(channel.remoteAddress().toString(), true);
 					return false;
 				}
-			} catch (Exception error) { }
+			}catch (Exception error) {  return false;}
 		}
 
 		return false;

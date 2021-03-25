@@ -12,6 +12,12 @@ import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 
 public class IllegalEndTeleport implements Listener {
 
+	private RayzsAntiCrasher instance;
+	
+	public IllegalEndTeleport() {
+		instance = RayzsAntiCrasher.getInstance();
+	}
+	
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		Player player = event.getPlayer();
@@ -20,11 +26,13 @@ public class IllegalEndTeleport implements Listener {
 		if (teleportCause != TeleportCause.END_PORTAL)
 			return;
 		event.setCancelled(true);
-		Bukkit.getScheduler().runTaskLater(RayzsAntiCrasher.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				if (player != null) player.teleport(toLocation);
-			}
-		}, 15);
+		try {
+			Bukkit.getScheduler().runTaskLater(RayzsAntiCrasher.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					if (player != null) player.teleport(toLocation);
+				}
+			}, 15);
+		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
 	}
 }

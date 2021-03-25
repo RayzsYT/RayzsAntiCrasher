@@ -30,9 +30,9 @@ public class PlayerJoin implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		CraftPlayer craftPlayer = (CraftPlayer) player;
-		String clientAddress = player.getAddress().getHostString().toString().split(":")[0];
+		final Player player = event.getPlayer();
+		final CraftPlayer craftPlayer = (CraftPlayer) player;
+		final String clientAddress = player.getAddress().getHostString().toString().split(":")[0];
 		if (!api.existCrashPlayer(player))
 			api.createCrashPlayer(player);
 		if (instance.useMySQL())
@@ -50,8 +50,7 @@ public class PlayerJoin implements Listener {
 				});
 			else api.setNotify(player, 1);
 		if (instance.getServerInjector().hasInjected(craftPlayer.getHandle().playerConnection.networkManager.channel))
-			instance.getServerInjector()
-					.uninjectChannel(craftPlayer.getHandle().playerConnection.networkManager.channel);
+			instance.getServerInjector().uninjectChannel(craftPlayer.getHandle().playerConnection.networkManager.channel);
 		if (player.hasPermission("rayzsanticrasher.admin"))
 			if (!instance.hasValidVersion())
 				Bukkit.getScheduler().runTaskLater(instance, new Runnable() {
@@ -65,7 +64,7 @@ public class PlayerJoin implements Listener {
 								new TextComponent(" §7to get the newest version§8."));
 					}
 				}, 20);
-
+		
 		Bukkit.getScheduler().runTaskLater(instance, new Runnable() {
 			@Override
 			public void run() {

@@ -2,15 +2,19 @@ package de.rayzs.rayzsanticrasher.crasher.impl.server;
 
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
+import de.rayzs.rayzsanticrasher.crasher.meth.LiveAttackCounter;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketStatusInPing;
 
 public class StatusPingAttack extends ServerCheck {
 
-	Integer connectionsAllowed, maxConnections, maxSingleConnections;
+	private Boolean liveActionbar, checkWaitingPlayers;
+	private Integer connectionsAllowed, maxConnections, maxSingleConnections;
 
 	public StatusPingAttack() {
+		checkWaitingPlayers = Boolean.parseBoolean(getFileManager("checkWaitingPlayers", this).getString("false"));
+		liveActionbar = Boolean.parseBoolean(getFileManager("liveActionbar", this).getString("false"));
 		connectionsAllowed = getFileManager("maxAllowedConnections", this).getInt(8);
 		maxConnections = getFileManager("maxConnections", this).getInt(10);
 		maxSingleConnections = getFileManager("maxSingleConnections", this).getInt(10);
@@ -51,7 +55,10 @@ public class StatusPingAttack extends ServerCheck {
 
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
-					if (!attack.isWaiting(clientAddress)) attack.addWaiting(clientAddress);
+					if (!attack.isWaiting(clientAddress)) {
+						System.err.println(clientAddress + " ADDED");
+						attack.addWaiting(clientAddress);
+					}
 					channel.flush();
 					channel.close();
 				}
@@ -62,10 +69,10 @@ public class StatusPingAttack extends ServerCheck {
 	}
 
 	private void onAttack(Attack attack, Integer saveAmount) {
-		
-		if(attack.isUnderAttack())
+		if (attack.isUnderAttack())
 			return;
-		
+		if (getInstance().useLiveAttackCounter() && liveActionbar)
+			new LiveAttackCounter(attack, 1000);
 		attack.setState(true);
 		(new Thread(() -> {
 			while (attack.isUnderAttack()) {
@@ -74,25 +81,42 @@ public class StatusPingAttack extends ServerCheck {
 					return;
 				}
 				try {
-				if (!attack.getBlacklist().isEmpty()) {
-					for (String currentAddress : attack.getBlacklist()) {
-						attack.ipTable(currentAddress, true);
-						attack.removeBlacklist(currentAddress);
-					}
-				}
-				if (!attack.getWaitinglist().isEmpty()) {
-					for (String currentAddress : attack.getWhitelist()) {
-						if (!getAPI().isVPN(currentAddress)) {
-							attack.addWhitelist(currentAddress);
-							attack.removeWaiting(currentAddress);
-							continue;
+					if (!attack.getBlacklist().isEmpty()) {
+						for (String currentAddress : attack.getBlacklist()) {
+							attack.ipTable(currentAddress, true);
+							attack.removeBlacklist(currentAddress);
 						}
-						attack.ipTable(currentAddress, true);
-						attack.removeWaiting(currentAddress);
 					}
+				} catch (Exception error) {
 				}
-				}catch (Exception error) {}
-				try { Thread.sleep(1000); } catch (InterruptedException error) { }
+				if (checkWaitingPlayers)
+					try {
+						if (!attack.getWaitinglist().isEmpty()) {
+							try {
+								System.err.println("STARTING CHECK");
+								System.err.println("START CHECK");
+								for (String currentAddress : attack.getWaitinglist()) {
+									System.err.println(currentAddress + " CHECKING");
+									if (!getAPI().isProxy(currentAddress)) {
+										System.err.println(currentAddress + " SUCCES");
+										attack.addWhitelist(currentAddress);
+										attack.removeWaiting(currentAddress);
+										continue;
+									}
+									System.err.println(currentAddress + " ILLEGAL");
+									attack.ipTable(currentAddress, true);
+									attack.removeWaiting(currentAddress);
+								}
+							} catch (Exception | OutOfMemoryError error) {
+								System.err.println("ERROR CHECK" + error.getMessage());
+							}
+						}
+					} catch (Exception error) {
+					}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException error) {
+				}
 			}
 		})).start();
 	}

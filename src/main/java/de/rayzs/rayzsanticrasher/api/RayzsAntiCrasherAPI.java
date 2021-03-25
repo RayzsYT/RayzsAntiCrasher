@@ -12,12 +12,13 @@ import de.rayzs.rayzsanticrasher.crasher.ext.ClientCheck;
 import de.rayzs.rayzsanticrasher.crasher.ext.ClientSourceCheck;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
-import de.rayzs.rayzsanticrasher.json.JsonReader;
+import de.rayzs.rayzsanticrasher.json.SecuredJsonReader;
 import de.rayzs.rayzsanticrasher.notify.Notify;
 import de.rayzs.rayzsanticrasher.player.CrashPlayer;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 import de.rayzs.rayzsanticrasher.runtime.RuntimeExec;
 import io.netty.channel.Channel;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class RayzsAntiCrasherAPI {
@@ -29,7 +30,7 @@ public class RayzsAntiCrasherAPI {
 	private List<ClientSourceCheck> clientSourceCheckList;
 	private List<Listener> listenerCheckList;
 	private List<Player> notifyList;
-	private List<String> notifyAddressList;
+	private List<String> notifyAddressList, tempBlockedPlayers;
 	private HashMap<Player, CrashPlayer> crashplayerHash;
 	private HashMap<UUID, Integer> notifyHash;
 	private Attack handshakeAttack, loginAttack, pingAttack, pingStatusAttack;
@@ -43,10 +44,11 @@ public class RayzsAntiCrasherAPI {
 		clientSourceCheckList = new ArrayList<>();
 		serverCheckList = new ArrayList<>();
 		listenerCheckList = new ArrayList<>();
+		notifyList = new ArrayList<>();
+		tempBlockedPlayers = new ArrayList<>();
+		notifyAddressList = new ArrayList<>();
 		crashplayerHash = new HashMap<>();
 		notifyHash = new HashMap<>();
-		notifyList = new ArrayList<>();
-		notifyAddressList = new ArrayList<>();
 		useIPTables = Boolean.valueOf(instance.getConfigFile().search("settings.iptables").getString("false"));
 		handshakeAttack = new Attack("Handshake", useIPTables);
 		loginAttack = new Attack("Login", useIPTables);
@@ -104,13 +106,20 @@ public class RayzsAntiCrasherAPI {
 		doNotify("§8[§9R§bA§9C§8] §b" + player.getName() + " §8» §b" + clazz.getSimpleName() + " §8┊┊ §b" + reason,
 				player);
 	}
-	
+
 	public void disconnectChannel(Channel channel) {
 		String clientAddress = channel.remoteAddress().toString().split(":")[0].replace("/", "");
 		channel.flush();
 		channel.close();
+		addTempBlockedIP(clientAddress);
 		ipTable(clientAddress, true);
-		try { Thread.sleep(1000); } catch (InterruptedException error) { if(instance.useDebug()) error.printStackTrace(); }
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException error) {
+			if (instance.useDebug())
+				error.printStackTrace();
+		}
+		removeTempBlockedIP(clientAddress);
 		ipTable(clientAddress, false);
 	}
 
@@ -170,6 +179,26 @@ public class RayzsAntiCrasherAPI {
 		}
 	}
 
+	public void addTempBlockedIP(String clientAddress) {
+		if (hasTempBlockedIP(clientAddress))
+			return;
+		tempBlockedPlayers.add(clientAddress);
+	}
+
+	public void removeTempBlockedIP(String clientAddress) {
+		if (!hasTempBlockedIP(clientAddress))
+			return;
+		tempBlockedPlayers.remove(clientAddress);
+	}
+
+	public Boolean hasTempBlockedIP(String clientAddress) {
+		return tempBlockedPlayers.contains(clientAddress);
+	}
+
+	public List<String> getTempBlockedIPList() {
+		return tempBlockedPlayers;
+	}
+
 	public List<ClientCheck> getClientChecks() {
 		return clientCheckList;
 	}
@@ -189,17 +218,31 @@ public class RayzsAntiCrasherAPI {
 	public Boolean existNotify(Player player) {
 		return (notifyHash.get(player.getUniqueId()) != null);
 	}
-	
+
 	public Boolean doIPTable() {
 		return useIPTables;
 	}
 
 	public Boolean isVPN(String clientAddress) {
-		try {
-			return new JsonReader("http://api.vpnblocker.net/v2/json/" + clientAddress).get("host-ip").equals("true");
-		} catch (Exception error) {
-			return false;
-		}
+		SecuredJsonReader unsecuredJsonReader = new SecuredJsonReader(
+				"https://vpnapi.io/api/" + clientAddress + "?key=F9J3K1V02MFO1C93KA7B.json");
+		unsecuredJsonReader.get("ip");
+		Boolean vpn = (Boolean)unsecuredJsonReader.get("security", "vpn");
+		Boolean proxy = (Boolean)unsecuredJsonReader.get("security", "proxy");
+		Boolean tor = (Boolean)unsecuredJsonReader.get("security", "tor");
+		if (vpn || proxy | tor)
+			return true;
+		return false;
+	}
+	
+	public Boolean isProxy(String clientAddress) {
+		SecuredJsonReader unsecuredJsonReader = new SecuredJsonReader(
+				"https://vpnapi.io/api/" + clientAddress + "?key=F9J3K1V02MFO1C93KA7B.json");
+		unsecuredJsonReader.get("ip");
+		Boolean proxy = (Boolean)unsecuredJsonReader.get("security", "proxy");
+		if (proxy)
+			return true;
+		return false;
 	}
 
 	public Integer getNotify(Player player) {
@@ -226,6 +269,17 @@ public class RayzsAntiCrasherAPI {
 
 	public Attack getPingStatusAttack() {
 		return pingStatusAttack;
+	}
+
+	public Float getServerTPS() {
+		Float tps = null;
+		for (double currentTPS : MinecraftServer.getServer().recentTps) {
+			tps = (float) (Math.round(currentTPS * Math.pow(10, 2)) / Math.pow(10, 2));
+			break;
+		}
+		if (tps > 20)
+			tps = (float) 20.0;
+		return tps;
 	}
 
 	public void setNotify(Player player, Integer value) {

@@ -32,7 +32,7 @@ public class IllegalItemDrop implements Listener {
 		if(!nmsItem.hasTag())
 			return;
 		if(nmsItem.getTag().toString().length() > max) {
-			((CraftPlayer)player).getHandle().playerConnection.networkManager.channel.close();
+			api.disconnectChannel(((CraftPlayer)player).getHandle().playerConnection.networkManager.channel);
 			item.remove();
 			api.createCustomReport(player, this.getClass(), "Item has to many nbttags!");
 		}

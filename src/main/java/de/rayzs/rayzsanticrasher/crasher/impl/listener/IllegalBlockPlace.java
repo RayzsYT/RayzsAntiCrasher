@@ -25,18 +25,20 @@ public class IllegalBlockPlace implements Listener {
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
-		Player player = event.getPlayer();
-		org.bukkit.inventory.ItemStack item = event.getItemInHand();
-		if (item == null)
-			return;
-		net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-		if (!nmsItem.hasTag())
-			return;
-		if (nmsItem.getTag().toString().length() > max) {
-			event.getPlayer().getInventory().removeItem(item);
-			event.setBuild(false);
-			((CraftPlayer)player).getHandle().playerConnection.networkManager.channel.close();
-			api.createCustomReport(player, this.getClass(), "Trying to place invalid block!");
-		}
+		try {
+			Player player = event.getPlayer();
+			org.bukkit.inventory.ItemStack item = event.getItemInHand();
+			if (item == null)
+				return;
+			net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+			if (!nmsItem.hasTag())
+				return;
+			if (nmsItem.getTag().toString().length() > max) {
+				event.getPlayer().getInventory().removeItem(item);
+				event.setBuild(false);
+				api.disconnectChannel(((CraftPlayer)player).getHandle().playerConnection.networkManager.channel);
+				api.createCustomReport(player, this.getClass(), "Trying to place invalid block!");
+			}
+		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
 	}
 }

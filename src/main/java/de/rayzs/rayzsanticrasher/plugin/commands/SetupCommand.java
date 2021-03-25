@@ -14,7 +14,6 @@ import de.rayzs.rayzsanticrasher.crasher.ext.ClientCheck;
 import de.rayzs.rayzsanticrasher.crasher.ext.ClientSourceCheck;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 public class SetupCommand implements CommandExecutor {
 
@@ -41,11 +40,11 @@ public class SetupCommand implements CommandExecutor {
 			return true;
 		}
 
-		String command = args[0].toLowerCase();
+		final String command = args[0].toLowerCase();
 
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			String uuid = player.getUniqueId().toString();
+			final String uuid = player.getUniqueId().toString();
 			if (alreadyExecuted.contains(uuid)) {
 				player.sendMessage(
 						"§8[§9R§bA§9C§8] §7You§8'§7ve to §e§nwait§8, §7until be able executing this command again§8!");
@@ -70,18 +69,9 @@ public class SetupCommand implements CommandExecutor {
 				Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
 					@Override
 					public void run() {
-						StringBuilder stringBuilder = new StringBuilder("§8[§9R§bA§9C§8] §7Current TPS §8[§b");
-						for (double tps : MinecraftServer.getServer().recentTps) {
-							float newTPS = (float) round(tps, 2);
-							if(newTPS >= 20) {
-								stringBuilder.append("§9*");
-								newTPS = 20;
-							}
-							stringBuilder.append("§b" + newTPS);
-							break;
-						}
-						stringBuilder.append("§8]");
-						player.sendMessage(stringBuilder.toString());
+						final Float tps = api.getServerTPS();
+						final String message = "§8[§9R§bA§9C§8] §7Current TPS §8[§b" + tps + "§8]";
+						player.sendMessage(message);
 					}
 				});
 				return true;
@@ -92,7 +82,7 @@ public class SetupCommand implements CommandExecutor {
 					sender.sendMessage("§8[§4R§cA§4C§8] §7You§8'§7re not allowed to execute that§8!");
 					return false;
 				}
-				Integer getNotification = api.getNotify(player);
+				final Integer getNotification = api.getNotify(player);
 				Integer setNotification = 0;
 				switch (getNotification) {
 				case 0:
@@ -174,9 +164,5 @@ public class SetupCommand implements CommandExecutor {
 		sender.sendMessage("§8 - §8/§9rac §b" + "checks");
 		sender.sendMessage("§8 - §8/§9rac §b" + "tps");
 		sender.sendMessage("§8 - §8/§9rac §b" + "addons");
-	}
-	
-	private double round(double time, int much) {
-		return Math.round(time * Math.pow(10, much)) / Math.pow(10, much);
 	}
 }

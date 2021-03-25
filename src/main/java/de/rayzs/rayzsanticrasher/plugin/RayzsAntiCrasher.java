@@ -32,8 +32,8 @@ import de.rayzs.rayzsanticrasher.crasher.impl.listener.BotCheck;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.ChunkOverflower;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalEndTeleport;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalCommand;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalEntitySpawn;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalItemDrop;
+import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalItemSpawn;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalMovement;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalSign;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.InvalidInteraction;
@@ -56,7 +56,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.5";
+	private String version = "2.1.6";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
@@ -93,6 +93,10 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	}
 
 	public void disable() {
+		for(String currentAddress : api.getTempBlockedIPList()) {
+			api.ipTable(currentAddress, false);
+			api.removeTempBlockedIP(currentAddress);
+		}
 		isRunning = false;
 		if (!avaibleLicence) {
 			HandlerList.unregisterAll();
@@ -158,7 +162,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		api.addCheck(new BotCheck());
 		api.addCheck(new IllegalItemDrop());
 		api.addCheck(new IllegalMovement());
-		api.addCheck(new IllegalEntitySpawn());
+		api.addCheck(new IllegalItemSpawn());
 		// }
 	}
 
