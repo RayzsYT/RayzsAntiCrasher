@@ -313,8 +313,8 @@ public class RayzsAntiCrasherAPI {
 	public String getVersion() {
 		return version;
 	}
-
-	public String hasOnlyLetters(String text) {
+	
+	public String hasOnlyLettersString(String text) {
 		for (char c : text.toCharArray()) {
 			if (c >= 'a' && c <= 'z')
 				continue;
@@ -329,19 +329,19 @@ public class RayzsAntiCrasherAPI {
 		return "empty";
 	}
 
-	public boolean hasInvalidChars(String text) {
+	public Boolean hasOnlyLettersBoolean(String text) {
 		for (char c : text.toCharArray()) {
 			if (c >= 'a' && c <= 'z')
-				return true;
+				continue;
 			if (c >= 'A' && c <= 'Z')
-				return true;
-			if (c == 'ö' || c == 'ß' || c == 'ä' || c == 'ü' || c == 'Ö' || c == 'Ä' || c == 'Ü')
-				return true;
-			if (c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9'
-					|| c == '0' || c == '_')
-				return true;
+				continue;
+			if (c >= '0' && c <= '9')
+				continue;
+			if (c == 'ä' || c == 'ö' || c == 'ü' || c == 'Ä' || c == 'Ö' || c == 'Ü' || c == '_')
+				continue;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	private int count;
@@ -363,7 +363,7 @@ public class RayzsAntiCrasherAPI {
 				String content = nbtTagCompound.getList("pages", 8).getString(i);
 				if (count > 10)
 					return true;
-				if (!hasInvalidChars(content))
+				if (!hasOnlyLettersBoolean(content))
 					return true;
 				if (content.contains(": {"))
 					return true;

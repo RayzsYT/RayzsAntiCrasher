@@ -26,7 +26,7 @@ public class IllegalCommand implements Listener {
 			try {
 				if(message.length() <= 1) return;
 				final String command = splittedMessage[1];
-				String onlyLetters = RayzsAntiCrasher.getAPI().hasOnlyLetters(command);
+				String onlyLetters = RayzsAntiCrasher.getAPI().hasOnlyLettersString(command);
 				if (!onlyLetters.equals("empty")) {
 					player.sendMessage("§8[§9R§bA§9C§8] §7You§8'§7re not allowed to use this symbol§8!");
 					player.sendMessage("§8[§9R§bA§9C§8] §7Your message§8: §e"

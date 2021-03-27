@@ -56,7 +56,6 @@ public class StatusPingAttack extends ServerCheck {
 			if (attack.isUnderAttack())
 				if (!attack.isWhitelisted(clientAddress)) {
 					if (!attack.isWaiting(clientAddress)) {
-						System.err.println(clientAddress + " ADDED");
 						attack.addWaiting(clientAddress);
 					}
 					channel.flush();
@@ -87,36 +86,26 @@ public class StatusPingAttack extends ServerCheck {
 							attack.removeBlacklist(currentAddress);
 						}
 					}
-				} catch (Exception error) {
-				}
+				} catch (Exception error) { }
 				if (checkWaitingPlayers)
 					try {
 						if (!attack.getWaitinglist().isEmpty()) {
 							try {
-								System.err.println("STARTING CHECK");
-								System.err.println("START CHECK");
 								for (String currentAddress : attack.getWaitinglist()) {
-									System.err.println(currentAddress + " CHECKING");
 									if (!getAPI().isProxy(currentAddress)) {
-										System.err.println(currentAddress + " SUCCES");
 										attack.addWhitelist(currentAddress);
 										attack.removeWaiting(currentAddress);
 										continue;
 									}
-									System.err.println(currentAddress + " ILLEGAL");
 									attack.ipTable(currentAddress, true);
 									attack.removeWaiting(currentAddress);
 								}
-							} catch (Exception | OutOfMemoryError error) {
-								System.err.println("ERROR CHECK" + error.getMessage());
-							}
+							} catch (Exception | OutOfMemoryError error) { }
 						}
-					} catch (Exception error) {
-					}
+					} catch (Exception error) { }
 				try {
 					Thread.sleep(1000);
-				} catch (InterruptedException error) {
-				}
+				} catch (InterruptedException error) { }
 			}
 		})).start();
 	}

@@ -28,6 +28,8 @@ public class VPNCheck implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 		final String clientAddress = player.getAddress().getAddress().getHostAddress();
+		if(clientAddress.equals("127.0.0.1"))
+			return;
 		(new Thread(() -> {
 				Boolean usingVPN = RayzsAntiCrasher.getAPI().isVPN(clientAddress);
 				if (usingVPN) {

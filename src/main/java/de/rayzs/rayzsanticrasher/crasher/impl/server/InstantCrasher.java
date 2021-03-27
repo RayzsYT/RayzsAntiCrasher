@@ -50,8 +50,8 @@ public class InstantCrasher extends ServerCheck {
 					getAPI().ipTable(channel.remoteAddress().toString(), true);
 					return false;
 				}
-				String onlyLetters = RayzsAntiCrasher.getAPI().hasOnlyLetters(name);
-				if (!onlyLetters.equals("empty")) {
+				Boolean onlyLetters = RayzsAntiCrasher.getAPI().hasOnlyLettersBoolean(name);
+				if (!onlyLetters) {
 					channel.flush();
 					channel.close();
 					getAPI().ipTable(channel.remoteAddress().toString(), true);

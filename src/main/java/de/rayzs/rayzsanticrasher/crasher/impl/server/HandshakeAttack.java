@@ -65,7 +65,7 @@ public class HandshakeAttack extends ServerCheck {
 					channel.flush();
 					channel.close();
 				}
-		}catch (Exception error) {  return false;}
+		}catch (Exception error) { return false; }
 		return false;
 	}
 
@@ -88,8 +88,7 @@ public class HandshakeAttack extends ServerCheck {
 							attack.removeBlacklist(currentAddress);
 						}
 					}
-				} catch (Exception error) {
-				}
+				} catch (Exception error) { }
 				if (checkWaitingPlayers)
 					try {
 						if (!attack.getWaitinglist().isEmpty()) {
@@ -108,8 +107,7 @@ public class HandshakeAttack extends ServerCheck {
 					} catch (Exception error) { }
 				try {
 					Thread.sleep(1000);
-				} catch (InterruptedException error) {
-				}
+				} catch (InterruptedException error) { }
 			}
 		})).start();
 	}

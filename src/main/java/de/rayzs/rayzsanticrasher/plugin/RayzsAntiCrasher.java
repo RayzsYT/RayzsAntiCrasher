@@ -13,6 +13,7 @@ import de.rayzs.rayzsanticrasher.plugin.listener.PlayerJoin;
 import de.rayzs.rayzsanticrasher.plugin.listener.PlayerQuit;
 import de.rayzs.rayzsanticrasher.addon.AddonManager;
 import de.rayzs.rayzsanticrasher.api.RayzsAntiCrasherAPI;
+import de.rayzs.rayzsanticrasher.bstats.Metrics;
 import de.rayzs.rayzsanticrasher.crasher.impl.client.BlockDig;
 import de.rayzs.rayzsanticrasher.crasher.impl.client.Chat;
 import de.rayzs.rayzsanticrasher.crasher.impl.client.ClientCommand;
@@ -38,6 +39,7 @@ import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalMovement;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalSign;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.InvalidInteraction;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.HandshakeAttack;
+import de.rayzs.rayzsanticrasher.crasher.impl.server.IllegalConnectionBuilder;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.InstantCrasher;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.LoginStartAttack;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.OnlyProxyPing;
@@ -56,7 +58,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.6";
+	private String version = "2.1.7";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
@@ -66,6 +68,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	private File thisFile, addonFolder;
 	private AddonManager addonManager;
 	private String configFilePath, crashReportMessage, standardMessage, liveAttackMessage;
+	protected Metrics metrics;
 
 	@Override
 	public void onDisable() {
@@ -74,6 +77,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		metrics = new Metrics(this, 10804);
 		enable();
 	}
 
@@ -133,6 +137,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		api.addCheck(new StartPingAttack());
 		api.addCheck(new StatusPingAttack());
 		api.addCheck(new OnlyProxyPing());
+		api.addCheck(new IllegalConnectionBuilder());
 		// }
 
 		// CLIENT {
@@ -168,7 +173,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private void loadUpdate() {
 		validVersion = false;
-		logger("§8[§4R§cA§4C§8] §7The plugin is just checked for a new version...");
+		logger("§8[§4R§cA§4C§8] §7Checking for a new update...");
 		new UpdateChecker(this).getVersion(gotVersion -> {
 			if (gotVersion.equalsIgnoreCase(version)) {
 				logger("§8[§4R§cA§4C§8] §7This plugin is up to date!");
@@ -222,7 +227,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 			if(!result) return;
 			setServerPropeties(searching, false);
 		}else
-			logger("§8[§4R§cA§4C§8] §7We recomment you to use §bPaperSpigot §7as your new server version§8!");
+			logger("§8[§4R§cA§4C§8] §7I recomment you to use §bPaperSpigot §7as your new server version§8!");
 	}
 	
 	protected void loadPropeties() {

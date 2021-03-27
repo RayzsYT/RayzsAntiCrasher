@@ -23,23 +23,31 @@ public class InputOverflow extends ByteToMessageDecoder {
 	protected void decode(ChannelHandlerContext channel, ByteBuf byteBuf, List<Object> list) throws Exception {
 		try {
 			
+			if(channel == null) {
+				return;
+			}
+			
+			if(channel.channel() == null) {
+				return;
+			}
+			
 			if(!channel.channel().isActive()) {
-				channel.close();
+				api.disconnectChannel(channel.channel());
 				return;
 			}
 			
 			if(!channel.channel().isOpen()) {
-				channel.close();
+				api.disconnectChannel(channel.channel());
 				return;
 			}
 			
 			if(!channel.channel().isWritable()) {
-				channel.close();
+				api.disconnectChannel(channel.channel());
 				return;
 			}
 			
 			if(channel.channel().remoteAddress() == null) {
-				channel.disconnect();
+				api.disconnectChannel(channel.channel());
 				return;
 			}
 			
