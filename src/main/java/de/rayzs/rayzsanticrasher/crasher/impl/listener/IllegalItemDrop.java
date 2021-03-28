@@ -1,6 +1,5 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.listener;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -32,9 +31,9 @@ public class IllegalItemDrop implements Listener {
 		if(!nmsItem.hasTag())
 			return;
 		if(nmsItem.getTag().toString().length() > max) {
-			api.disconnectChannel(((CraftPlayer)player).getHandle().playerConnection.networkManager.channel);
+			api.kickPlayer(player, "Dropping an item with too many nbttags");
 			item.remove();
-			api.createCustomReport(player, this.getClass(), "Item has to many nbttags!");
+			api.createCustomReport(player, this.getClass(), "Item has too many nbttags!");
 		}
 	}
 }

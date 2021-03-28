@@ -1,5 +1,6 @@
 package de.rayzs.rayzsanticrasher.plugin.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +23,13 @@ public class PlayerQuit implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		if (api.existCrashPlayer(player))
-			api.deleteCrashPlayer(player);
+		Bukkit.getScheduler().runTaskLater(instance, new Runnable() {
+			
+			@Override
+			public void run() {
+				if (api.existCrashPlayer(player))
+					api.deleteCrashPlayer(player);
+			}
+		}, 1);
 	}
 }

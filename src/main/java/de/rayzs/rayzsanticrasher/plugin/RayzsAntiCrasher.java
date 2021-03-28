@@ -39,7 +39,6 @@ import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalMovement;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalSign;
 import de.rayzs.rayzsanticrasher.crasher.impl.listener.InvalidInteraction;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.HandshakeAttack;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.IllegalConnectionBuilder;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.InstantCrasher;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.LoginStartAttack;
 import de.rayzs.rayzsanticrasher.crasher.impl.server.OnlyProxyPing;
@@ -58,16 +57,17 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.7";
+	private String version = "2.1.8";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
 	private BasicSQL notifySQL;
 	private FileManager mysqlFile, checkFile, configFile;
-	private Boolean useMySQL, validVersion, isSimpleCloud, isRunning, liveAttackCounter, debug, recommentedServerConfiguration, avaibleLicence = false;
+	private Boolean useMySQL, validVersion, isSimpleCloud, isRunning, liveAttackCounter, debug,
+			recommentedServerConfiguration, avaibleLicence = false;
 	private File thisFile, addonFolder;
 	private AddonManager addonManager;
-	private String configFilePath, crashReportMessage, standardMessage, liveAttackMessage;
+	private String configFilePath, crashReportMessage, standardMessage, liveAttackMessage, kickMessage, vpnMessage, botMessage;
 	protected Metrics metrics;
 
 	@Override
@@ -97,7 +97,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	}
 
 	public void disable() {
-		for(String currentAddress : api.getTempBlockedIPList()) {
+		for (String currentAddress : api.getTempBlockedIPList()) {
 			api.ipTable(currentAddress, false);
 			api.removeTempBlockedIP(currentAddress);
 		}
@@ -137,7 +137,6 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		api.addCheck(new StartPingAttack());
 		api.addCheck(new StatusPingAttack());
 		api.addCheck(new OnlyProxyPing());
-		api.addCheck(new IllegalConnectionBuilder());
 		// }
 
 		// CLIENT {
@@ -186,9 +185,11 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	public void loadPlugin() {
 		this.pluginManager = getServer().getPluginManager();
-		liveAttackCounter = Boolean.valueOf(instance.getConfigFile().search("settings.liveAttackCounter").getString("true"));
+		liveAttackCounter = Boolean
+				.valueOf(instance.getConfigFile().search("settings.liveAttackCounter").getString("true"));
 		debug = Boolean.valueOf(instance.getConfigFile().search("settings.debugMode").getString("true"));
-		recommentedServerConfiguration = Boolean.valueOf(instance.getConfigFile().search("settings.recommentedServerConfiguration").getString("true"));
+		recommentedServerConfiguration = Boolean
+				.valueOf(instance.getConfigFile().search("settings.recommentedServerConfiguration").getString("true"));
 		api = new RayzsAntiCrasherAPI(this, version);
 		logger("§8[§4R§cA§4C§8] §7Injecting minecraft server...");
 		serverInjector = new ServerInjector(this);
@@ -210,7 +211,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		loadAllPlayers();
 		logger("§8[§4R§cA§4C§8] §7Loading properties...");
 		loadPropeties();
-		if(recommentedServerConfiguration) {
+		if (recommentedServerConfiguration) {
 			logger("§8[§4R§cA§4C§8] §7Loading recommented server configuration...");
 			loadRecommentedServerConfiguration();
 			logger("§8[§4R§cA§4C§8] §7Done!");
@@ -218,25 +219,33 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		logger("§8[§4R§cA§4C§8] §7The plugin could be loaded §asuccessfully§8!");
 		addonManager.loadAddons();
 	}
-	
+
 	private void loadRecommentedServerConfiguration() {
 		String serverVersion = getServer().getVersion();
-		if(serverVersion.contains("PaperSpigot")) {
+		if (serverVersion.contains("PaperSpigot")) {
 			String searching = "use-native-transport";
 			Boolean result = Boolean.parseBoolean(getServerPropeties(searching).toString());
-			if(!result) return;
+			if (!result)
+				return;
 			setServerPropeties(searching, false);
-		}else
+		} else
 			logger("§8[§4R§cA§4C§8] §7I recomment you to use §bPaperSpigot §7as your new server version§8!");
 	}
-	
+
 	protected void loadPropeties() {
 		crashReportMessage = instance.getConfigFile().search("messages.crashreport")
 				.getString("&7&8[&9R&bA&9C&8] &b%CLIENT% &8| &b%DETECTION% %AMOUNT%&9x &b&n&o%PACKET%");
 		standardMessage = instance.getConfigFile().search("messages.informations")
 				.getString("&7This server is using &9Rayzs&bAnti&9Crasher &8- &b&l&nv%VERSION%&8.");
-		liveAttackMessage = instance.getConfigFile().search("messages.liveattack")
-				.getString("&8>> &8[&4&n%ATTACK%&8] &c&nSERVER IS UNDER ATTACK&8! &7Blocked&8-&7IP&8'&7s&8: &b&l&o&n%BLOCKED%&8 | &7CPS&8: &b%CPS% &8<<");
+		liveAttackMessage = instance.getConfigFile().search("messages.liveattack").getString(
+				"&8>> &8[&4&n%ATTACK%&8] &c&nSERVER IS UNDER ATTACK&8! &7Blocked&8-&7IP&8'&7s&8: &b&l&o&n%BLOCKED%&8 | &7CPS&8: &b%CPS% &8<<");
+		kickMessage = instance.getConfigFile().search("messages.kick.crash").getString(
+				"&9&lRayzs&b&lAnti&9&lCrasher%NEW%&7Don't try to &c&ncrash&7 my server&8.%NEW%&7Reason&8: &b%REASON%");
+		logger("§8[§4R§cA§4C§8] §7Done!");
+		vpnMessage = instance.getConfigFile().search("messages.kick.vpn").getString(
+				"&9&lRayzs&b&lAnti&9&lCrasher%NEW%&7Don't try using an &c&nvpn &7on my server&8.");
+		botMessage = instance.getConfigFile().search("messages.kick.bot").getString(
+				"&9&lRayzs&b&lAnti&9&lCrasher%NEW%&7I don't like &cbots &7btw. :3");
 		logger("§8[§4R§cA§4C§8] §7Done!");
 	}
 
@@ -268,6 +277,38 @@ public class RayzsAntiCrasher extends JavaPlugin {
 			;
 		}
 	}
+	
+	public String getStandartMessage() {
+		final String text = standardMessage.replace("%VERSION%", version);
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+
+	public String getCrashReportMessage(String client, Integer amount, String check, String packet) {
+		final String text = (crashReportMessage.replace("%CLIENT%", client).replace("%AMOUNT%", amount.toString())
+				.replace("%DETECTION%", check).replace("%PACKET%", packet));
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+
+	public String getLiveAttackMessage(Attack attack) {
+		final String text = (liveAttackMessage.replace("%CPS%", attack.getConnections().toString())
+				.replace("%ATTACK%", attack.getTaskName()).replace("%BLOCKED%", attack.getBlacklist().size() + ""));
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+	
+	public String getKickMessage(String reason) {
+		final String text = kickMessage.replace("%NEW%", "\n").replace("%REASON%", reason);
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+	
+	public String getVPNKickMessage() {
+		final String text = vpnMessage.replace("%NEW%", "\n");
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
+	
+	public String getBotKickMessage() {
+		final String text = botMessage.replace("%NEW%", "\n");
+		return ChatColor.translateAlternateColorCodes('&', text);
+	}
 
 	public AddonManager getAddonManager() {
 		return addonManager;
@@ -293,31 +334,14 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		return mysql;
 	}
 
-	public String getStandartMessage() {
-		final String text = standardMessage.replace("%VERSION%", version);
-		return ChatColor.translateAlternateColorCodes('&', text);
-	}
-
-	public String getCrashReportMessage(String client, Integer amount, String check, String packet) {
-		final String text = (crashReportMessage.replace("%CLIENT%", client).replace("%AMOUNT%", amount.toString())
-				.replace("%DETECTION%", check).replace("%PACKET%", packet));
-		return ChatColor.translateAlternateColorCodes('&', text);
-	}
-	
-	public String getLiveAttackMessage(Attack attack) {
-		final String text = (liveAttackMessage.replace("%CPS%", attack.getConnections().toString())
-				.replace("%ATTACK%", attack.getTaskName()).replace("%BLOCKED%", attack.getBlacklist().size() + ""));
-		return ChatColor.translateAlternateColorCodes('&', text);
-	}
-
 	public Boolean useLiveAttackCounter() {
 		return liveAttackCounter;
 	}
-	
+
 	public Boolean useMySQL() {
 		return useMySQL;
 	}
-	
+
 	public Boolean useDebug() {
 		return debug;
 	}
@@ -345,16 +369,16 @@ public class RayzsAntiCrasher extends JavaPlugin {
 	public ServerInjector getServerInjector() {
 		return this.serverInjector;
 	}
-	
+
 	public Object getServerPropeties(String property) {
 		return ((DedicatedServer) MinecraftServer.getServer()).propertyManager.properties.get(property);
 	}
-	
+
 	public void setServerPropeties(String property, Object object) {
-	   ((DedicatedServer) MinecraftServer.getServer()).propertyManager.setProperty(property, object);
-	   ((DedicatedServer) MinecraftServer.getServer()).propertyManager.savePropertiesFile();
+		((DedicatedServer) MinecraftServer.getServer()).propertyManager.setProperty(property, object);
+		((DedicatedServer) MinecraftServer.getServer()).propertyManager.savePropertiesFile();
 	}
-	
+
 	protected void loadSQL() {
 		try {
 			notifySQL = new BasicSQL("RayzsAntiCrasher", "UUID text, NOTIFY integer", "'" + 1 + "'");

@@ -51,7 +51,7 @@ public class Crasher {
 			boolean check;
 			check = currentCheck.onCheck(channel, player, packetName, packet, amount);
 			if (check) {
-				api.disconnectChannel(channel);
+				if(channel != null) api.disconnectChannel(channel);
 				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(player.getName(), amount,
 						currentCheck.getClass().getSimpleName(), packetName), player);
 				return;
@@ -64,7 +64,7 @@ public class Crasher {
 			boolean check;
 			check = currentCheck.onCheck(channel, player, packetName, packet);
 			if (check) {
-				api.disconnectChannel(channel);
+				if(channel != null) api.disconnectChannel(channel);
 				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(player.getName(), amount,
 						currentCheck.getClass().getSimpleName(), packetName), player);
 				return;
@@ -78,13 +78,13 @@ public class Crasher {
 			check = currentCheck.onCheck(channel, packetName, packet);
 			if (check) {
 				String address = channel.remoteAddress().toString().split(":")[0];
-				api.disconnectChannel(channel);
+				if(channel != null) api.disconnectChannel(channel);
 				try {
 					api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(address, amount,
 							currentCheck.getClass().getSimpleName(), packetName), player);
 					return;
 				} catch (Exception error) {
-					api.disconnectChannel(channel);
+					if(channel != null) api.disconnectChannel(channel);
 				}
 				return;
 			}

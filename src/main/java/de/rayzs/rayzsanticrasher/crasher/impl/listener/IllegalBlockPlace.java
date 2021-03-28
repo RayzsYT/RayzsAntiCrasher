@@ -1,6 +1,5 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.listener;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,7 +35,7 @@ public class IllegalBlockPlace implements Listener {
 			if (nmsItem.getTag().toString().length() > max) {
 				event.getPlayer().getInventory().removeItem(item);
 				event.setBuild(false);
-				api.disconnectChannel(((CraftPlayer)player).getHandle().playerConnection.networkManager.channel);
+				api.kickPlayer(player, "Trying to place an invalid block");
 				api.createCustomReport(player, this.getClass(), "Trying to place invalid block!");
 			}
 		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }

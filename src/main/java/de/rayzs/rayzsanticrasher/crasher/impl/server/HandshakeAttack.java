@@ -4,6 +4,7 @@ import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import de.rayzs.rayzsanticrasher.crasher.meth.LiveAttackCounter;
 import io.netty.channel.Channel;
+import net.minecraft.server.v1_8_R3.EnumProtocol;
 import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketHandshakingInSetProtocol;
 
@@ -65,7 +66,23 @@ public class HandshakeAttack extends ServerCheck {
 					channel.flush();
 					channel.close();
 				}
-		}catch (Exception error) { return false; }
+		}catch (Exception error) { }
+		
+		PacketHandshakingInSetProtocol handshakingInSetProtocolPacket = (PacketHandshakingInSetProtocol) packet;
+		if (handshakingInSetProtocolPacket.hostname == null) {
+			getAPI().disconnectChannel(channel);
+			return false;
+
+		}
+		if (!(handshakingInSetProtocolPacket.a() instanceof EnumProtocol)) {
+			getAPI().disconnectChannel(channel);
+			return false;
+		}
+		if (handshakingInSetProtocolPacket.b() > 800 || handshakingInSetProtocolPacket.b() < 1) {
+			getAPI().disconnectChannel(channel);
+			return false;
+		}
+		
 		return false;
 	}
 

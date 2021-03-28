@@ -20,11 +20,15 @@ public class BlockDig extends ClientCheck {
 		if (!(packet instanceof PacketPlayInBlockDig))
 			return false;
 		try {
-			if (amount > max)
+			if (amount > max) {
+				getAPI().kickPlayer(player, "Too fast BlockDig");
 				return true;
+			}
 			PacketPlayInBlockDig blockDig = (PacketPlayInBlockDig) packet;
-			if (blockDig.a() == null || blockDig.b() == null || blockDig.c() == null)
+			if (blockDig.a() == null || blockDig.b() == null || blockDig.c() == null) {
+				getAPI().kickPlayer(player, "Breaking block with invalid data");
 				return true;
+			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

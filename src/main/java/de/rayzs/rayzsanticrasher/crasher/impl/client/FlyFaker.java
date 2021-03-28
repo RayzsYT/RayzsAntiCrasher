@@ -18,6 +18,7 @@ public class FlyFaker extends ClientCheck {
 			Boolean isFlying = inAbilities.isFlying();
 			if (isFlying == true && player.getGameMode() != GameMode.CREATIVE) {
 				if (!player.getAllowFlight()) {
+					getAPI().kickPlayer(player, "Illegal flying");
 					return true;
 				}
 			}

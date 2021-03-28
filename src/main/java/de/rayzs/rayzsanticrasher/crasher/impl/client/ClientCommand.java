@@ -19,8 +19,10 @@ public class ClientCommand extends ClientCheck {
 	public boolean onCheck(Channel channel, Player player, String packetName, Packet<?> packet, Integer amount) {
 		if (!(packet instanceof PacketPlayInClientCommand))
 			return false;
-		if (amount > max)
+		if (amount > max) {
+			getAPI().kickPlayer(player, "Too fast executing commands");
 			return true;
+		}
 		return false;
 	}
 }

@@ -21,10 +21,14 @@ public class Spectate extends ClientCheck {
 		if (!(packet instanceof PacketPlayInSpectate))
 			return false;
 		try {
-			if (player.getGameMode() != GameMode.SPECTATOR)
+			if (player.getGameMode() != GameMode.SPECTATOR) {
+				getAPI().kickPlayer(player, "Spectating players without beeing in spectator mode");
 				return true;
-			if (amount > max)
+			}
+			if (amount > max) {
+				getAPI().kickPlayer(player, "Sending too much spectate packets");
 				return true;
+			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

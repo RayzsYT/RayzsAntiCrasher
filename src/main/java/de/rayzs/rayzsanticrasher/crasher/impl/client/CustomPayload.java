@@ -23,10 +23,14 @@ public class CustomPayload extends ClientCheck {
 			PacketPlayInCustomPayload customPayload = (PacketPlayInCustomPayload) packet;
 			String doBook = customPayload.a();
 			if (doBook.equals("MC|BEdit") || doBook.equals("MC|BSign")) {
-				if (!player.getItemInHand().getType().toString().contains("BOOK"))
+				if (!player.getItemInHand().getType().toString().contains("BOOK")) {
+					getAPI().kickPlayer(player, "Editing / Signing book without holding ones");
 					return true;
-				if (amount > max)
+				}
+				if (amount > max) {
+					getAPI().kickPlayer(player, "Too fast sending custompayloads");
 					return true;
+				}
 			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;

@@ -1,6 +1,5 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.listener;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,8 +33,7 @@ public class VPNCheck implements Listener {
 				Boolean usingVPN = RayzsAntiCrasher.getAPI().isVPN(clientAddress);
 				if (usingVPN) {
 					try {
-						api.disconnectChannel(
-								((CraftPlayer) player).getHandle().playerConnection.networkManager.channel);
+						player.kickPlayer(instance.getVPNKickMessage());
 						new Notify(RayzsAntiCrasher.getInstance(), RayzsAntiCrasher.getAPI()).send(
 								"§8[§9R§bA§9C§8] §b" + player.getName() + "§7 got §cdetected §7by using a VPN§8!");
 					}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }

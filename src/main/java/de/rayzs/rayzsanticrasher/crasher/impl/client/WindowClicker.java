@@ -23,15 +23,27 @@ public class WindowClicker extends ClientCheck {
 		if (!(packet instanceof PacketPlayInWindowClick))
 			return false;
 		try {
-			if (amount > max) return true;
+			if (amount > max) {
+				getAPI().kickPlayer(player, "Sending too much windowclick packets");
+				return true;
+			}
 			PacketPlayInWindowClick windowClick = (PacketPlayInWindowClick) packet;
 			net.minecraft.server.v1_8_R3.ItemStack stack = windowClick.e();
 			if(stack == null) return false;
 			if (stack.getTag() == null) return false;
-			if (stack.getTag().toString().length() > maxNBTLenght) return true;
+			if (stack.getTag().toString().length() > maxNBTLenght) {
+				getAPI().kickPlayer(player, "Clicking on a item with too big nbttag");
+				return true;
+			}
 			CraftItemStack craftStack = CraftItemStack.asNewCraftStack(stack.getItem());
-			if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType().equals(Material.BOOK_AND_QUILL)) return true;
-			if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType() != player.getItemInHand().getType()) return true;
+			if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType().equals(Material.BOOK_AND_QUILL)) {
+				getAPI().kickPlayer(player, "Clicking on a book with invalid nbttag");
+				return true;
+			}
+			if (craftStack.getType() != player.getItemInHand().getType()) {
+				getAPI().kickPlayer(player, "Clicking on a book without holding it");
+				return true;
+			}
 			
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;

@@ -16,6 +16,7 @@ public class InstantCrasher extends ServerCheck {
 				channel.flush();
 				channel.close();
 			}
+			
 		}catch (Exception error) {  }
 		try {
 			if (packet instanceof PacketHandshakingInSetProtocol) {

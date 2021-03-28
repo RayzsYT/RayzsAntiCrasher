@@ -1,6 +1,5 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.listener;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +33,7 @@ public class InvalidInteraction implements Listener {
 			if (!nmsItem.hasTag()) return;
 			if (nmsItem.getTag().toString().length() > max) {
 				event.getPlayer().getInventory().removeItem(item);
-				api.disconnectChannel(((CraftPlayer)player).getHandle().playerConnection.networkManager.channel);
+				api.kickPlayer(player, "Interacting with item with too many nbttags");
 				api.createCustomReport(player, this.getClass(), "Trying to interact with a item with too many nbttags!");
 			}
 		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }

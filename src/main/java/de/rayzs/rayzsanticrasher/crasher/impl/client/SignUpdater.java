@@ -23,8 +23,10 @@ public class SignUpdater extends ClientCheck {
 		int z = playInUpdateSignPacket.a().getZ();
 		World world = player.getWorld();
 		Block block = world.getBlockAt(new Location(world, x, y, z));
-		if (block.getType() != Material.SIGN_POST && block.getType() != Material.WALL_SIGN)
+		if (block.getType() != Material.SIGN_POST && block.getType() != Material.WALL_SIGN) {
+			getAPI().kickPlayer(player, "Editing a sign with too big distance");
 			return true;
+		}
 		return false;
 	}
 }

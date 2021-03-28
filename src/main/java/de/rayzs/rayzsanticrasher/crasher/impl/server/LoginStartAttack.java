@@ -1,5 +1,7 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.server;
 
+import com.mojang.authlib.GameProfile;
+
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
 import de.rayzs.rayzsanticrasher.crasher.meth.LiveAttackCounter;
@@ -59,7 +61,21 @@ public class LoginStartAttack extends ServerCheck {
 					channel.flush();
 					channel.close();
 				}
-		}catch (Exception error) {  return false;}
+		}catch (Exception error) { }
+		
+		PacketLoginInStart loginInStartPacket = (PacketLoginInStart) packet;
+		if (loginInStartPacket.a() == null) {
+			getAPI().disconnectChannel(channel);
+			return false;
+		}
+
+		final GameProfile gameProfile = loginInStartPacket.a();
+
+		if (gameProfile.getName().length() >= 17) {
+			getAPI().disconnectChannel(channel);
+			return false;
+		}
+		
 		return false;
 	}
 

@@ -16,25 +16,37 @@ public class CreativeSlot extends ClientCheck {
 		if (!(packet instanceof PacketPlayInSetCreativeSlot))
 			return false;
 		try {
-			if (player.getGameMode() != GameMode.CREATIVE)
+			if (player.getGameMode() != GameMode.CREATIVE) {
+				getAPI().kickPlayer(player, "Sending creativeslot packets without creative mode");
 				return true;
-			if (amount > 3500)
+			}
+			if (amount > 3500) {
+				getAPI().kickPlayer(player, "Too fast sending creativeslot packets");
 				return true;
+			}
 			PacketPlayInSetCreativeSlot creativeSlot = (PacketPlayInSetCreativeSlot) packet;
 			Integer slot = creativeSlot.a();
 			ItemStack itemstack = creativeSlot.getItemStack();
 			if(itemstack == null)
 				return false;
-			if (!(slot instanceof Integer) || slot == null)
+			if (!(slot instanceof Integer) || slot == null) {
+				getAPI().kickPlayer(player, "Interacting with an invalid creative slot");
 				return true;
-			if (slot >= 100 || slot < 0)
+			}
+			if (slot >= 100 || slot < 0) {
+				getAPI().kickPlayer(player, "Using illegal slot");
 				return true;
+			}
 			if(!itemstack.hasTag())
 				return false;
-			if(itemstack.getTag().toString().length() > 5000)
+			if(itemstack.getTag().toString().length() > 5000) {
+				getAPI().kickPlayer(player, "Taking item with too big nbttag");
 				return true;
-			if (getAPI().hasInvalidTag(itemstack.getTag()))
-				player.getInventory().removeItem(player.getItemInHand());
+			}
+			if (getAPI().hasInvalidTag(itemstack.getTag())) {
+				getAPI().kickPlayer(player, "Taking item with invalid nbttag");
+				return true;
+			}
 		}catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

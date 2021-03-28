@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-
 import de.rayzs.rayzsanticrasher.crasher.ext.ClientCheck;
 import de.rayzs.rayzsanticrasher.crasher.ext.ClientSourceCheck;
 import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
@@ -18,8 +18,10 @@ import de.rayzs.rayzsanticrasher.player.CrashPlayer;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 import de.rayzs.rayzsanticrasher.runtime.RuntimeExec;
 import io.netty.channel.Channel;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import net.minecraft.server.v1_8_R3.PacketPlayOutKickDisconnect;
 
 public class RayzsAntiCrasherAPI {
 
@@ -107,6 +109,20 @@ public class RayzsAntiCrasherAPI {
 				player);
 	}
 
+	public void kickPlayer(Player player, String reason) {
+		final String kickMessage = instance.getKickMessage(reason);
+		final ChatComponentText textComponent = new ChatComponentText(kickMessage);
+		final PacketPlayOutKickDisconnect packet = new PacketPlayOutKickDisconnect(textComponent);
+		((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+	}
+
+	public void kickPlayer(CraftPlayer player, String reason) {
+		final String kickMessage = instance.getKickMessage(reason);
+		final ChatComponentText textComponent = new ChatComponentText(kickMessage);
+		final PacketPlayOutKickDisconnect packet = new PacketPlayOutKickDisconnect(textComponent);
+		player.getHandle().playerConnection.sendPacket(packet);
+	}
+	
 	public void disconnectChannel(Channel channel) {
 		String clientAddress = channel.remoteAddress().toString().split(":")[0].replace("/", "");
 		channel.flush();
@@ -227,19 +243,19 @@ public class RayzsAntiCrasherAPI {
 		SecuredJsonReader unsecuredJsonReader = new SecuredJsonReader(
 				"https://vpnapi.io/api/" + clientAddress + "?key=F9J3K1V02MFO1C93KA7B.json");
 		unsecuredJsonReader.get("ip");
-		Boolean vpn = (Boolean)unsecuredJsonReader.get("security", "vpn");
-		Boolean proxy = (Boolean)unsecuredJsonReader.get("security", "proxy");
-		Boolean tor = (Boolean)unsecuredJsonReader.get("security", "tor");
+		Boolean vpn = (Boolean) unsecuredJsonReader.get("security", "vpn");
+		Boolean proxy = (Boolean) unsecuredJsonReader.get("security", "proxy");
+		Boolean tor = (Boolean) unsecuredJsonReader.get("security", "tor");
 		if (vpn || proxy | tor)
 			return true;
 		return false;
 	}
-	
+
 	public Boolean isProxy(String clientAddress) {
 		SecuredJsonReader unsecuredJsonReader = new SecuredJsonReader(
 				"https://vpnapi.io/api/" + clientAddress + "?key=F9J3K1V02MFO1C93KA7B.json");
 		unsecuredJsonReader.get("ip");
-		Boolean proxy = (Boolean)unsecuredJsonReader.get("security", "proxy");
+		Boolean proxy = (Boolean) unsecuredJsonReader.get("security", "proxy");
 		if (proxy)
 			return true;
 		return false;
@@ -313,7 +329,7 @@ public class RayzsAntiCrasherAPI {
 	public String getVersion() {
 		return version;
 	}
-	
+
 	public String hasOnlyLettersString(String text) {
 		for (char c : text.toCharArray()) {
 			if (c >= 'a' && c <= 'z')

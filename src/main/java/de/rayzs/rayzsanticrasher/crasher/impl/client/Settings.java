@@ -23,8 +23,10 @@ public class Settings extends ClientCheck {
 			PacketPlayInSettings settings = (PacketPlayInSettings) packet;
 			if (settings.a() == null)
 				return true;
-			if (amount > max)
+			if (amount > max) {
+				getAPI().kickPlayer(player, "Sending too much setting packets");
 				return true;
+			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

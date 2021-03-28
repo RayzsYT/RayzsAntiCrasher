@@ -22,10 +22,14 @@ public class Chat extends ClientCheck {
 		try {
 			PacketPlayInChat pa = (PacketPlayInChat) packet;
 			String input = pa.a();
-			if (input == null || input == "")
+			if (input == null || input == "") {
+				getAPI().kickPlayer(player, "Sending message without input");
 				return true;
-			if (amount > max)
+			}
+			if (amount > max) {
+				getAPI().kickPlayer(player, "Too fast chatting");
 				return true;
+			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

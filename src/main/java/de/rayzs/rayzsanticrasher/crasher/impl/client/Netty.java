@@ -31,18 +31,18 @@ public class Netty extends ClientCheck {
 			if(stack == null) return false;
 			if (stack.getTag() == null) return false;
 			if (stack.getTag().toString().length() > max) {
-				channel.close();
+				getAPI().kickPlayer(player, "Sending too fast custompayloads");
 				return true;	
 			}
 			CraftItemStack craftStack = CraftItemStack.asNewCraftStack(stack.getItem());
 			if (bookCheck)
 				if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType().equals(Material.BOOK_AND_QUILL)) {
-					channel.close();
+					getAPI().kickPlayer(player, "Using a book without holding ones");
 					return true;
 				}
 			if (invalidItemCheck) {
 				if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType() != player.getItemInHand().getType()) {
-					channel.close();
+					getAPI().kickPlayer(player, "Using a item without having it");
 					return true;
 				}
 			}

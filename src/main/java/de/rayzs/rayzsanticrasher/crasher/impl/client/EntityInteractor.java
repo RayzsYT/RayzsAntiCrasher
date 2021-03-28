@@ -19,8 +19,10 @@ public class EntityInteractor extends ClientCheck {
 	public boolean onCheck(Channel channel, Player player, String packetName, Packet<?> packet, Integer amount) {
 		if (!(packet instanceof PacketPlayInUseEntity))
 			return false;
-		if (amount > max)
+		if (amount > max) {
+			getAPI().kickPlayer(player, "Too fast interacting with entity");
 			return true;
+		}
 		return false;
 	}
 }

@@ -1,11 +1,9 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.listener;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
-
 import de.rayzs.rayzsanticrasher.api.RayzsAntiCrasherAPI;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 
@@ -36,7 +34,7 @@ public class IllegalSign implements Listener {
 			}
 			if(isInvalid) {
 				event.setCancelled(true);
-				api.disconnectChannel(((CraftPlayer)player).getHandle().playerConnection.networkManager.channel);
+				api.kickPlayer(player, "Too big distance to the sign");
 				RayzsAntiCrasher.getAPI().createCustomReport(player, this.getClass(), "Too big distance to sign!");
 			}
 		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }

@@ -60,7 +60,10 @@ public class StartPingAttack extends ServerCheck {
 					channel.flush();
 					channel.close();
 				}
-		}catch (Exception error) {  return false;}
+		}catch (Exception error) { }
+		
+		
+		
 		return false;
 	}
 

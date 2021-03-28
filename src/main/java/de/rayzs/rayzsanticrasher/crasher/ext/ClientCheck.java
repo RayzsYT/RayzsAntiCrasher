@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import de.rayzs.rayzsanticrasher.api.RayzsAntiCrasherAPI;
 import de.rayzs.rayzsanticrasher.file.FileManager;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
-import de.rayzs.rayzsanticrasher.runtime.RuntimeExec;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.Packet;
 
@@ -13,13 +12,6 @@ public abstract class ClientCheck {
 	
 	public abstract boolean onCheck(Channel channel, Player player, String packetName, Packet<?> packet,
 			Integer amount);
-
-	public void ipTable(String address, Boolean bool) {
-		if (bool)
-			new RuntimeExec("iptables -I INPUT -s " + address + " -j DROP");
-		else
-			new RuntimeExec("iptables -D INPUT -s " + address + " -j DROP");
-	}
 
 	public RayzsAntiCrasherAPI getAPI() {
 		return RayzsAntiCrasher.getAPI();

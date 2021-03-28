@@ -59,6 +59,7 @@ public class InputOverflow extends ByteToMessageDecoder {
 			}
 			
 			if (byteBuf.array().length > 5000) {
+				api.kickPlayer(player, "Sending a packet with an too big input");
 				api.disconnectChannel(channel.channel());
 				api.doNotify(RayzsAntiCrasher.getInstance().getCrashReportMessage(clientAddress, byteBuf.array().length,
 						this.getClass().getSimpleName(), byteBuf.toString()), player);

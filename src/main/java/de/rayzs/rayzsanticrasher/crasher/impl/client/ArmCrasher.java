@@ -19,8 +19,10 @@ public class ArmCrasher extends ClientCheck {
 	public boolean onCheck(Channel channel, Player player, String packetName, Packet<?> packet, Integer amount) {
 		if (!(packet instanceof PacketPlayInArmAnimation))
 			return false;
-		if (amount > max)
+		if (amount > max) {
+			getAPI().kickPlayer(player, "Too fast ArmAnimation");
 			return true;
+		}
 		return false;
 	}
 }

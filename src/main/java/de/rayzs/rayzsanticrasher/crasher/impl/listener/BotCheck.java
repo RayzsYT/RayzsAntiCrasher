@@ -77,7 +77,7 @@ public class BotCheck implements Listener {
 			(new BukkitRunnable() {
 				public void run() {
 					if (player.getLocation().equals(playerLocationHash.get(player))) {
-						craftPlayer.getHandle().playerConnection.networkManager.channel.close();
+						player.kickPlayer(instance.getBotKickMessage());
 						if (broadcastReport)
 							new Notify(RayzsAntiCrasher.getInstance(), RayzsAntiCrasher.getAPI()).send(
 									"§8[§9R§bA§9C§8] §b" + player.getName() + "§7 got §cdetected §7playing as a bot§8!");

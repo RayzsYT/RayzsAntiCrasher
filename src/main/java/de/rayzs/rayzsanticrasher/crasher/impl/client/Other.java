@@ -37,12 +37,16 @@ public class Other extends ClientCheck {
 			if (packetName.equals("PacketPlayInFlying$PacketPlayInPositionLook")
 					|| packetName.equals("PacketPlayInFlying")
 					|| packetName.equals("PacketPlayInFlying$PacketPlayInPosition")) {
-				if (amount > filteredMax)
+				if (amount > filteredMax) {
+					getAPI().kickPlayer(player, "Sending too much " + packetName + " packets");
 					return true;
+				}
 				return false;
 			}
-			if (amount > unfilteredMax)
+			if (amount > unfilteredMax) {
+				getAPI().kickPlayer(player, "Sending too much " + packetName + " packets");
 				return true;
+			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

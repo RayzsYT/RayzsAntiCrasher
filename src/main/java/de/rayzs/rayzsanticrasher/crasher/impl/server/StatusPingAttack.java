@@ -61,7 +61,11 @@ public class StatusPingAttack extends ServerCheck {
 					channel.flush();
 					channel.close();
 				}
-		} catch (Exception error) {
+		} catch (Exception error) { }
+		
+		PacketStatusInPing statusInPingPacket = (PacketStatusInPing) packet;
+		if (statusInPingPacket.a() > Integer.MAX_VALUE) {
+			getAPI().disconnectChannel(channel);
 			return false;
 		}
 		return false;

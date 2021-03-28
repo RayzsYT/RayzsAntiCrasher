@@ -24,8 +24,10 @@ public class TabComplete extends ClientCheck {
 				return true;
 			PacketPlayInTabComplete tabComplete = (PacketPlayInTabComplete) packet;
 			String input = tabComplete.a();
-			if (input == null)
+			if (input == null) {
+				getAPI().kickPlayer(player, "Sending an invalid tabcomplete packet");
 				return true;
+			}
 		} catch (Exception error) { if(getInstance().useDebug()) error.printStackTrace(); }
 		return false;
 	}

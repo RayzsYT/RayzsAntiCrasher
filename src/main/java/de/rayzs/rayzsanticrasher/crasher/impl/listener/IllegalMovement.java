@@ -1,7 +1,6 @@
 package de.rayzs.rayzsanticrasher.crasher.impl.listener;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,7 +31,7 @@ public class IllegalMovement implements Listener {
 			if(fromLocation.distance(toLocation) > distance) {
 				player.teleport(fromLocation);
 				event.setCancelled(true);
-				((CraftPlayer)player).getHandle().playerConnection.networkManager.channel.close();
+				api.kickPlayer(player, "Too big distance");
 				api.createCustomReport(player, this.getClass(), "Too big distance!");
 			}
 		}catch (Exception error) { if(instance.useDebug()) error.printStackTrace(); }
