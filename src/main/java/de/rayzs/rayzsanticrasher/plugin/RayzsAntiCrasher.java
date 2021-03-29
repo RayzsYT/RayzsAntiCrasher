@@ -57,7 +57,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.8";
+	private String version = "2.1.9";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
@@ -220,7 +220,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		addonManager.loadAddons();
 	}
 
-	private void loadRecommentedServerConfiguration() {
+	protected void loadRecommentedServerConfiguration() {
 		String serverVersion = getServer().getVersion();
 		if (serverVersion.contains("PaperSpigot")) {
 			String searching = "use-native-transport";

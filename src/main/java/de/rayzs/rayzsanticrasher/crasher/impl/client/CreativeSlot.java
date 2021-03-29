@@ -33,7 +33,7 @@ public class CreativeSlot extends ClientCheck {
 				getAPI().kickPlayer(player, "Interacting with an invalid creative slot");
 				return true;
 			}
-			if (slot >= 100 || slot < 0) {
+			if (slot >= 100 || slot < -1) {
 				getAPI().kickPlayer(player, "Using illegal slot");
 				return true;
 			}

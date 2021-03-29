@@ -35,13 +35,10 @@ public class WindowClicker extends ClientCheck {
 				getAPI().kickPlayer(player, "Clicking on a item with too big nbttag");
 				return true;
 			}
+			
 			CraftItemStack craftStack = CraftItemStack.asNewCraftStack(stack.getItem());
 			if (getAPI().hasInvalidTag(stack.getTag()) && craftStack.getType().equals(Material.BOOK_AND_QUILL)) {
 				getAPI().kickPlayer(player, "Clicking on a book with invalid nbttag");
-				return true;
-			}
-			if (craftStack.getType() != player.getItemInHand().getType()) {
-				getAPI().kickPlayer(player, "Clicking on a book without holding it");
 				return true;
 			}
 			
