@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import de.rayzs.rayzsanticrasher.addon.Addon;
 import de.rayzs.rayzsanticrasher.api.RayzsAntiCrasherAPI;
-import de.rayzs.rayzsanticrasher.crasher.ext.ClientCheck;
-import de.rayzs.rayzsanticrasher.crasher.ext.ClientSourceCheck;
-import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
+import de.rayzs.rayzsanticrasher.checks.ext.ClientCheck;
+import de.rayzs.rayzsanticrasher.checks.ext.ClientSourceCheck;
+import de.rayzs.rayzsanticrasher.checks.ext.ServerCheck;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 
 public class SetupCommand implements CommandExecutor {
@@ -69,7 +69,7 @@ public class SetupCommand implements CommandExecutor {
 				Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
 					@Override
 					public void run() {
-						final Float tps = api.getServerTPS();
+						final Double tps = api.getServerTPS();
 						final String message = "§8[§9R§bA§9C§8] §7Current TPS §8[§b" + tps + "§8]";
 						player.sendMessage(message);
 					}

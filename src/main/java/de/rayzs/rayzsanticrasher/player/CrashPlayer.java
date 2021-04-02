@@ -6,8 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import de.rayzs.rayzsanticrasher.crasher.Crasher;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.InputOverflow;
+import de.rayzs.rayzsanticrasher.checks.Crasher;
+import de.rayzs.rayzsanticrasher.checks.impl.server.ByteBufReader;
 import de.rayzs.rayzsanticrasher.plugin.RayzsAntiCrasher;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -91,9 +91,9 @@ public class CrashPlayer {
 		try {
 			channel = craftplayer.getHandle().playerConnection.networkManager.channel;
 			if (channel.pipeline().get("decompress") != null)
-				channel.pipeline().addAfter("decompress", "cf_decompress", new InputOverflow(craftplayer));
+				channel.pipeline().addAfter("decompress", "cf_decompress", new ByteBufReader(craftplayer));
 			else
-				channel.pipeline().addAfter("splitter", "cf_decompress", new InputOverflow(craftplayer));
+				channel.pipeline().addAfter("splitter", "cf_decompress", new ByteBufReader(craftplayer));
 			
 			channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<Packet<?>>() {
 				@Override

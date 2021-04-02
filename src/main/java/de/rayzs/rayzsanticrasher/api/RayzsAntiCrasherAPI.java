@@ -8,10 +8,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import de.rayzs.rayzsanticrasher.crasher.ext.ClientCheck;
-import de.rayzs.rayzsanticrasher.crasher.ext.ClientSourceCheck;
-import de.rayzs.rayzsanticrasher.crasher.ext.ServerCheck;
-import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
+
+import de.rayzs.rayzsanticrasher.checks.ext.ClientCheck;
+import de.rayzs.rayzsanticrasher.checks.ext.ClientSourceCheck;
+import de.rayzs.rayzsanticrasher.checks.ext.ServerCheck;
+import de.rayzs.rayzsanticrasher.checks.meth.Attack;
 import de.rayzs.rayzsanticrasher.json.SecuredJsonReader;
 import de.rayzs.rayzsanticrasher.notify.Notify;
 import de.rayzs.rayzsanticrasher.player.CrashPlayer;
@@ -139,35 +140,35 @@ public class RayzsAntiCrasherAPI {
 		ipTable(clientAddress, false);
 	}
 
-	public void addCheck(ClientCheck clientCheck) {
+	public void addCheck(ClientCheck clientCheck, Boolean bool) {
 		if (this.clientCheckList.contains(clientCheck))
 			return;
 		String check = clientCheck.getClass().getSimpleName().toLowerCase().split("@")[0];
-		if (instance.getCheckFile().search("checks.client." + check).getString("true").equals("true"))
+		if (instance.getCheckFile().search("checks.client." + check).getString(bool.toString()).equals("true"))
 			this.clientCheckList.add(clientCheck);
 	}
 
-	public void addCheck(ClientSourceCheck clientSourceCheck) {
+	public void addCheck(ClientSourceCheck clientSourceCheck, Boolean bool) {
 		if (this.clientSourceCheckList.contains(clientSourceCheck))
 			return;
 		String check = clientSourceCheck.getClass().getSimpleName().toLowerCase().split("@")[0];
-		if (instance.getCheckFile().search("checks.clientsource." + check).getString("true").equals("true"))
+		if (instance.getCheckFile().search("checks.clientsource." + check).getString(bool.toString()).equals("true"))
 			this.clientSourceCheckList.add(clientSourceCheck);
 	}
 
-	public void addCheck(ServerCheck serverCheck) {
+	public void addCheck(ServerCheck serverCheck, Boolean bool) {
 		if (this.serverCheckList.contains(serverCheck))
 			return;
 		String check = serverCheck.getClass().getSimpleName().toLowerCase().split("@")[0];
-		if (instance.getCheckFile().search("checks.server." + check).getString("true").equals("true"))
+		if (instance.getCheckFile().search("checks.server." + check).getString(bool.toString()).equals("true"))
 			this.serverCheckList.add(serverCheck);
 	}
 
-	public void addCheck(Listener listenerCheck) {
+	public void addCheck(Listener listenerCheck, Boolean bool) {
 		if (this.listenerCheckList.contains(listenerCheck))
 			return;
 		String check = listenerCheck.getClass().getSimpleName().toLowerCase().split("@")[0];
-		if (instance.getCheckFile().search("checks.listener." + check).getString("true").equals("true")) {
+		if (instance.getCheckFile().search("checks.listener." + check).getString(bool.toString()).equals("true")) {
 			this.listenerCheckList.add(listenerCheck);
 			instance.registerEvent(listenerCheck);
 		}
@@ -287,14 +288,14 @@ public class RayzsAntiCrasherAPI {
 		return pingStatusAttack;
 	}
 
-	public Float getServerTPS() {
-		Float tps = null;
+	public Double getServerTPS() {
+		Double tps = null;
 		for (double currentTPS : MinecraftServer.getServer().recentTps) {
-			tps = (float) (Math.round(currentTPS * Math.pow(10, 2)) / Math.pow(10, 2));
+			tps = (Double) (Math.round(currentTPS * Math.pow(10, 2)) / Math.pow(10, 2));
 			break;
 		}
 		if (tps > 20)
-			tps = (float) 20.0;
+			tps = (Double) 20.0;
 		return tps;
 	}
 

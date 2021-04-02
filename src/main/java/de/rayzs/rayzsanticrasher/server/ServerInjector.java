@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
 
-import de.rayzs.rayzsanticrasher.crasher.Crasher;
+import de.rayzs.rayzsanticrasher.checks.Crasher;
 import de.rayzs.rayzsanticrasher.server.Reflection.FieldAccessor;
 import de.rayzs.rayzsanticrasher.server.Reflection.MethodInvoker;
 import io.netty.channel.Channel;

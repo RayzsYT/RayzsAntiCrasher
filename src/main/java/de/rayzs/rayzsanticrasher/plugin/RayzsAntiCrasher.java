@@ -14,37 +14,38 @@ import de.rayzs.rayzsanticrasher.plugin.listener.PlayerQuit;
 import de.rayzs.rayzsanticrasher.addon.AddonManager;
 import de.rayzs.rayzsanticrasher.api.RayzsAntiCrasherAPI;
 import de.rayzs.rayzsanticrasher.bstats.Metrics;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.BlockDig;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.Chat;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.ClientCommand;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.CreativeSlot;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.CustomPayload;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.EntityInteractor;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.FlyFaker;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.Netty;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.Other;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.Settings;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.SignUpdater;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.Spectate;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.TabComplete;
-import de.rayzs.rayzsanticrasher.crasher.impl.client.WindowClicker;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.VPNCheck;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.BotCheck;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.ChunkOverflower;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalEndTeleport;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalCommand;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalItemDrop;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalItemSpawn;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalMovement;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.IllegalSign;
-import de.rayzs.rayzsanticrasher.crasher.impl.listener.InvalidInteraction;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.HandshakeAttack;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.InstantCrasher;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.LoginStartAttack;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.OnlyProxyPing;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.StartPingAttack;
-import de.rayzs.rayzsanticrasher.crasher.impl.server.StatusPingAttack;
-import de.rayzs.rayzsanticrasher.crasher.meth.Attack;
+import de.rayzs.rayzsanticrasher.checks.impl.client.BlockDig;
+import de.rayzs.rayzsanticrasher.checks.impl.client.Chat;
+import de.rayzs.rayzsanticrasher.checks.impl.client.ClientCommand;
+import de.rayzs.rayzsanticrasher.checks.impl.client.CreativeSlot;
+import de.rayzs.rayzsanticrasher.checks.impl.client.CustomPayload;
+import de.rayzs.rayzsanticrasher.checks.impl.client.EntityInteractor;
+import de.rayzs.rayzsanticrasher.checks.impl.client.FlyFaker;
+import de.rayzs.rayzsanticrasher.checks.impl.client.Netty;
+import de.rayzs.rayzsanticrasher.checks.impl.client.Other;
+import de.rayzs.rayzsanticrasher.checks.impl.client.Settings;
+import de.rayzs.rayzsanticrasher.checks.impl.client.SignUpdater;
+import de.rayzs.rayzsanticrasher.checks.impl.client.Spectate;
+import de.rayzs.rayzsanticrasher.checks.impl.client.TabComplete;
+import de.rayzs.rayzsanticrasher.checks.impl.client.WindowClicker;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.BotCheck;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.FAWE;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.IllegalCommand;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.IllegalEndTeleport;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.IllegalItemDrop;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.IllegalItemSpawn;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.IllegalMovement;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.IllegalSign;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.InvalidInteraction;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.RedstoneLag;
+import de.rayzs.rayzsanticrasher.checks.impl.listener.VPNCheck;
+import de.rayzs.rayzsanticrasher.checks.impl.server.HandshakeAttack;
+import de.rayzs.rayzsanticrasher.checks.impl.server.InstantCrasher;
+import de.rayzs.rayzsanticrasher.checks.impl.server.LoginStartAttack;
+import de.rayzs.rayzsanticrasher.checks.impl.server.OnlyProxyPing;
+import de.rayzs.rayzsanticrasher.checks.impl.server.StartPingAttack;
+import de.rayzs.rayzsanticrasher.checks.impl.server.StatusPingAttack;
+import de.rayzs.rayzsanticrasher.checks.meth.Attack;
 import de.rayzs.rayzsanticrasher.file.FileManager;
 import de.rayzs.rayzsanticrasher.server.ServerInjector;
 import de.rayzs.rayzsanticrasher.spigotmc.UpdateChecker;
@@ -57,7 +58,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	private static RayzsAntiCrasher instance;
 	private static RayzsAntiCrasherAPI api;
-	private String version = "2.1.9";
+	private String version = "2.1.10";
 	private ServerInjector serverInjector;
 	private PluginManager pluginManager;
 	private MySQL mysql;
@@ -108,9 +109,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		}
 		addonManager.unloadAddons();
 		logger("§8[§4R§cA§4C§8] §7The plugin is trying to §6shutting down§8...");
-		if (serverInjector != null) {
-			serverInjector.close();
-		}
+		if (serverInjector != null) serverInjector.close();
 		serverInjector = null;
 		try {
 			HandlerList.unregisterAll();
@@ -131,42 +130,43 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	public void implementsChecks() {
 		// Server {
-		api.addCheck(new InstantCrasher());
-		api.addCheck(new HandshakeAttack());
-		api.addCheck(new LoginStartAttack());
-		api.addCheck(new StartPingAttack());
-		api.addCheck(new StatusPingAttack());
-		api.addCheck(new OnlyProxyPing());
+		api.addCheck(new InstantCrasher(), true);
+		api.addCheck(new HandshakeAttack(), true);
+		api.addCheck(new LoginStartAttack(), true);
+		api.addCheck(new StartPingAttack(), true);
+		api.addCheck(new StatusPingAttack(), true);
+		api.addCheck(new OnlyProxyPing(), true);
 		// }
 
 		// CLIENT {
-		api.addCheck(new Netty());
-		api.addCheck(new CustomPayload());
-		api.addCheck(new CreativeSlot());
-		api.addCheck(new Settings());
-		api.addCheck(new Chat());
-		api.addCheck(new TabComplete());
-		api.addCheck(new ClientCommand());
-		api.addCheck(new IllegalCommand());
-		api.addCheck(new BlockDig());
-		api.addCheck(new Spectate());
-		api.addCheck(new WindowClicker());
-		api.addCheck(new EntityInteractor());
-		api.addCheck(new FlyFaker());
-		api.addCheck(new SignUpdater());
-		api.addCheck(new Other());
+		api.addCheck(new Netty(), true);
+		api.addCheck(new CustomPayload(), true);
+		api.addCheck(new CreativeSlot(), true);
+		api.addCheck(new Settings(), true);
+		api.addCheck(new Chat(), true);
+		api.addCheck(new TabComplete(), true);
+		api.addCheck(new ClientCommand(), true);
+		api.addCheck(new IllegalCommand(), true);
+		api.addCheck(new BlockDig(), true);
+		api.addCheck(new Spectate(), true);
+		api.addCheck(new WindowClicker(), true);
+		api.addCheck(new EntityInteractor(), true);
+		api.addCheck(new FlyFaker(), true);
+		api.addCheck(new SignUpdater(), true);
+		api.addCheck(new Other(), true);
 		// }
 
 		// LISTENER {
-		api.addCheck(new InvalidInteraction());
-		api.addCheck(new IllegalEndTeleport());
-		api.addCheck(new IllegalSign());
-		api.addCheck(new ChunkOverflower());
-		api.addCheck(new VPNCheck());
-		api.addCheck(new BotCheck());
-		api.addCheck(new IllegalItemDrop());
-		api.addCheck(new IllegalMovement());
-		api.addCheck(new IllegalItemSpawn());
+		api.addCheck(new InvalidInteraction(), true);
+		api.addCheck(new IllegalEndTeleport(), true);
+		api.addCheck(new IllegalSign(), true);
+		api.addCheck(new VPNCheck(), false);
+		api.addCheck(new BotCheck(), true);
+		api.addCheck(new IllegalItemDrop(), true);
+		api.addCheck(new IllegalMovement(), true);
+		api.addCheck(new IllegalItemSpawn(), true);
+		api.addCheck(new RedstoneLag(), true);
+		api.addCheck(new FAWE(), true);
 		// }
 	}
 
@@ -187,7 +187,7 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		this.pluginManager = getServer().getPluginManager();
 		liveAttackCounter = Boolean
 				.valueOf(instance.getConfigFile().search("settings.liveAttackCounter").getString("true"));
-		debug = Boolean.valueOf(instance.getConfigFile().search("settings.debugMode").getString("true"));
+		debug = Boolean.valueOf(instance.getConfigFile().search("settings.debugMode").getString("false"));
 		recommentedServerConfiguration = Boolean
 				.valueOf(instance.getConfigFile().search("settings.recommentedServerConfiguration").getString("true"));
 		api = new RayzsAntiCrasherAPI(this, version);
@@ -213,7 +213,12 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		loadPropeties();
 		if (recommentedServerConfiguration) {
 			logger("§8[§4R§cA§4C§8] §7Loading recommented server configuration...");
-			loadRecommentedServerConfiguration();
+			try {
+				loadRecommentedServerConfiguration();
+			}catch (Exception error) {
+				logger("§8[§4R§cA§4C§8] §7Error loading plugin§8! §7I need a §c§n1.8.8§7 server to work§8...");
+				return;
+			}
 			logger("§8[§4R§cA§4C§8] §7Done!");
 		}
 		logger("§8[§4R§cA§4C§8] §7The plugin could be loaded §asuccessfully§8!");
@@ -241,7 +246,6 @@ public class RayzsAntiCrasher extends JavaPlugin {
 				"&8>> &8[&4&n%ATTACK%&8] &c&nSERVER IS UNDER ATTACK&8! &7Blocked&8-&7IP&8'&7s&8: &b&l&o&n%BLOCKED%&8 | &7CPS&8: &b%CPS% &8<<");
 		kickMessage = instance.getConfigFile().search("messages.kick.crash").getString(
 				"&9&lRayzs&b&lAnti&9&lCrasher%NEW%&7Don't try to &c&ncrash&7 my server&8.%NEW%&7Reason&8: &b%REASON%");
-		logger("§8[§4R§cA§4C§8] §7Done!");
 		vpnMessage = instance.getConfigFile().search("messages.kick.vpn").getString(
 				"&9&lRayzs&b&lAnti&9&lCrasher%NEW%&7Don't try using an &c&nvpn &7on my server&8.");
 		botMessage = instance.getConfigFile().search("messages.kick.bot").getString(
@@ -263,19 +267,6 @@ public class RayzsAntiCrasher extends JavaPlugin {
 
 	public void unregisterEvent(Listener listener) {
 		HandlerList.unregisterAll(listener);
-	}
-
-	protected void loadAllPlayers() {
-		for (Player players : Bukkit.getOnlinePlayers()) {
-			if (!api.existCrashPlayer(players))
-				api.createCrashPlayer(players);
-			if (!instance.useMySQL()) {
-				if (players.hasPermission("rayzsanticrasher.notify") && !api.existNotify(players))
-					api.setNotify(players, 1);
-			} else
-				players.kickPlayer("§cYou have to reconnect from the server!");
-			;
-		}
 	}
 	
 	public String getStandartMessage() {
@@ -379,19 +370,32 @@ public class RayzsAntiCrasher extends JavaPlugin {
 		((DedicatedServer) MinecraftServer.getServer()).propertyManager.savePropertiesFile();
 	}
 
-	protected void loadSQL() {
-		try {
-			notifySQL = new BasicSQL("RayzsAntiCrasher", "UUID text, NOTIFY integer", "'" + 1 + "'");
-		} catch (Exception error) {
-		}
-	}
-
 	public void logger(String text) {
 		Bukkit.getConsoleSender().sendMessage("[RayzsAPI | RAC] " + text);
 		for (Player players : Bukkit.getOnlinePlayers()) {
 			if (!players.isOp())
 				continue;
 			players.sendMessage(text);
+		}
+	}
+	
+	protected void loadAllPlayers() {
+		for (Player players : Bukkit.getOnlinePlayers()) {
+			if (!api.existCrashPlayer(players))
+				api.createCrashPlayer(players);
+			if (!instance.useMySQL()) {
+				if (players.hasPermission("rayzsanticrasher.notify") && !api.existNotify(players))
+					api.setNotify(players, 1);
+			} else
+				players.kickPlayer("§cYou have to reconnect from the server!");
+			;
+		}
+	}
+	
+	protected void loadSQL() {
+		try {
+			notifySQL = new BasicSQL("RayzsAntiCrasher", "UUID text, NOTIFY integer", "'" + 1 + "'");
+		} catch (Exception error) {
 		}
 	}
 }

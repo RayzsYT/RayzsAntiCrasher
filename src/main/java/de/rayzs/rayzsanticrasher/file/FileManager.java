@@ -48,6 +48,17 @@ public class FileManager {
 		return this;
 	}
 
+	public Object get(Object defaultObject) {
+		if (yaml.getString(search) != null) {
+
+			return yaml.get(search);
+
+		} else {
+			set(search, defaultObject);
+			return get(defaultObject);
+		}
+	}
+	
 	public int getInt(int defaultInteger) {
 		if (yaml.getString(search) != null) {
 
@@ -56,6 +67,17 @@ public class FileManager {
 		} else {
 			setInt(search, defaultInteger);
 			return getInt(defaultInteger);
+		}
+	}
+	
+	public float getFloat(float defaultFloat) {
+		if (yaml.getString(search) != null) {
+
+			return (float) yaml.get(search);
+
+		} else {
+			setFloat(search, defaultFloat);
+			return getFloat(defaultFloat);
 		}
 	}
 
@@ -167,6 +189,17 @@ public class FileManager {
 	}
 
 	public void setInt(String path, Integer zahl) {
+		try {
+
+			yaml.set(path, zahl);
+			save();
+
+		} catch (Exception e) {
+			instance.getLogger().info("Error saving datas!");
+		}
+	}
+	
+	public void setFloat(String path, Float zahl) {
 		try {
 
 			yaml.set(path, zahl);
