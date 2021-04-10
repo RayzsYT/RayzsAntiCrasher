@@ -24,8 +24,8 @@ How you can interact with my addonsystem.
 Then click here.
 
 What my antivpn-system actually do?
-I actually use a api website for this.(https://vpnapi.io/)
- On every join to the server, my plugin ask in a scheduler and new thread if the connection of the player is used by a virtual proxy. If the player got detected by using a vpn, he will get blocked by my system (also iptabled - optional).
+I actually use a api website for this. | https://vpnapi.io/
+On every join to the server, my plugin ask in a scheduler and new thread if the connection of the player is used by a virtual proxy. If the player got detected by using a vpn, he will get blocked by my system (also iptabled - optional).
 
 What my antibot-system actually do?
 In my antibot, the user will get teleported by joining the server minimal blocks in the air. By multiplying the ping of the user with my scheduler, can I check if the user is standing on this location or not. If the play is standing on the location, he will be kicked, cause he is a bot. Everyone is able to join the server. Bots will be get kicked, cause they aren't moving then they got teleported.
