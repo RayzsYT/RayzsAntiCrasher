@@ -24,7 +24,7 @@ How you can interact with my addonsystem.
 Then click here.
 
 What my antivpn-system actually do?
-I actually use a api website for this. (https://vpnapi.io/)
+I actually use a api website for this. (https://blackbox.ipinfo.app)
 On every join to the server, my plugin ask in a scheduler and new thread if the connection of the player is used by a virtual proxy. If the player got detected by using a vpn, he will get blocked by my system (also iptabled - optional).
 
 What my antibot-system actually do?
