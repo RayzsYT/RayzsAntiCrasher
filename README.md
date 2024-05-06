@@ -1,6 +1,6 @@
-![saves2](https://user-images.githubusercontent.com/51991564/114282630-55edc980-9a45-11eb-8fda-a3a921783cbc.png)
+# Warning! Old and abandoned project!
 
-SpigotMC: https://www.rayzs.de/rayzsanticrasher/get
+![saves2](https://user-images.githubusercontent.com/51991564/114282630-55edc980-9a45-11eb-8fda-a3a921783cbc.png)
 
 Welcome to the one of the best anticrash-plugin on the spigotmc forum.
 You're asking why my plugin is one of the best?
